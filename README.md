@@ -1,146 +1,77 @@
 # MDViewer+ for Windows
 
-A fast, native Markdown viewer and editor built with **Tauri v2** and **CodeMirror 6**.
+The Windows port of [MDViewer+](https://github.com/trsdn/mdviewerplus) -- a minimal Markdown editor and viewer. Clean rendering, inline editing, and live preview -- no bloat.
+
+![Windows](https://img.shields.io/badge/Windows-10%2F11-0078D4?logo=windows&logoColor=white)
+![Tauri](https://img.shields.io/badge/Tauri-v2-FFC131?logo=tauri&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
 ## Features
 
-- **Split View** -- Editor and preview side by side
-- **Toggle View Modes** -- Switch between view, split, and edit (`Ctrl+E`)
-- **GitHub Flavored Markdown** -- Full GFM support via `marked.js`
-- **Dark / Light / System Theme** -- Automatic or manual theme switching
-- **Zoom** -- Independent zoom for editor and preview
-- **File Associations** -- Open `.md` files directly from Explorer
+- **Three view modes** -- view-only, split (editor + preview), and edit-only, cycled with `Ctrl+E`
+- **Live preview** -- edits render instantly in the side-by-side split view
+- **Scroll sync** -- bidirectional scroll synchronization between editor and preview
+- **Markdown formatting** -- Bold (`Ctrl+B`), Italic (`Ctrl+I`), Link (`Ctrl+K`)
+- **GitHub-flavored rendering** via [marked.js](https://marked.js.org)
+- **Dark mode** -- automatic (system), light, or dark via View > Appearance
+- **Context-aware zoom** -- `Ctrl+`/`Ctrl-` targets the active pane
+- **File associations** -- open `.md` files directly from Explorer
+- **Native file handling** -- Open, Save, Save As, Reload
 
-## Keyboard Shortcuts
+## Install
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl+O` | Open file |
-| `Ctrl+S` | Save |
-| `Ctrl+Shift+S` | Save As |
-| `Ctrl+E` | Toggle view mode |
-| `Ctrl+F` | Find |
-| `Ctrl+B` | **Bold** |
-| `Ctrl+I` | *Italic* |
-| `Ctrl+K` | [Link]() |
-| `Ctrl++` | Zoom in |
-| `Ctrl+-` | Zoom out |
-| `Ctrl+0` | Reset zoom |
+Download the latest installer from [Releases](https://github.com/trsdn/mdviewerplus-windows/releases) or build from source:
 
-## Markdown Examples
+### Prerequisites
 
-### Text Formatting
+- [Node.js](https://nodejs.org) (v18+)
+- [Rust](https://rustup.rs)
+- [Visual Studio Build Tools 2022](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with C++ workload
 
-This is **bold text** and this is *italic text*. You can also use ~~strikethrough~~ and `inline code`.
-
-> This is a blockquote. It can span
-> multiple lines and contains *formatted* text.
-
-### Lists
-
-Unordered list:
-
-- First item
-- Second item
-  - Nested item A
-  - Nested item B
-- Third item
-
-Ordered list:
-
-1. Step one
-2. Step two
-3. Step three
-
-### Task List
-
-- [x] Create Tauri project
-- [x] Implement editor with CodeMirror
-- [x] Add Markdown preview
-- [ ] Add syntax highlighting for code blocks
-- [ ] Export to PDF
-
-### Code Blocks
-
-JavaScript:
-
-```javascript
-async function openFile(filePath) {
-  const contents = await invoke('read_file', { path: filePath });
-  setContent(contents);
-  renderMarkdown(contents);
-}
-```
-
-Rust:
-
-```rust
-#[tauri::command]
-pub fn read_file(path: String) -> Result<String, String> {
-    fs::read_to_string(&path)
-        .map_err(|e| format!("Failed to read file: {}", e))
-}
-```
-
-### Table
-
-| Component | Technology | Purpose |
-|---|---|---|
-| Frontend | HTML/CSS/JS | UI rendering |
-| Editor | CodeMirror 6 | Text editing |
-| Preview | marked.js | Markdown to HTML |
-| Backend | Tauri v2 / Rust | Native APIs |
-| Bundler | esbuild | JS bundling |
-
-### Links
-
-- [Tauri Documentation](https://v2.tauri.app)
-- [CodeMirror](https://codemirror.net)
-- [marked.js](https://marked.js.org)
-
-### Horizontal Rule
-
----
-
-### Image Test
-
-If you place an image named `screenshot.png` next to this file, it will render below:
-
-![Screenshot](screenshot.png)
-
-## Architecture
-
-```
-mdviewerplus-windows/
-  src/
-    js/
-      main.js          -- App orchestrator
-      editor.js        -- CodeMirror setup
-      preview.js       -- Markdown rendering
-      shortcuts.js     -- Keyboard shortcuts
-      split-pane.js    -- Draggable splitter
-      theme.js         -- Theme management
-      zoom.js          -- Zoom controls
-  src-tauri/
-    src/
-      lib.rs           -- Tauri app setup
-      main.rs          -- Entry point
-      menu.rs          -- Native menu
-      commands.rs      -- Tauri commands
-  dist/
-    index.html         -- Main HTML
-    styles/            -- CSS files
-    bundle.js          -- Built JS bundle
-```
-
-## Build & Run
+### Build
 
 ```bash
 npm install
-npm run dev        # Development mode
-npm run build      # Production build
+npm run build
 ```
 
----
+The installer (NSIS + MSI) will be in `src-tauri/target/release/bundle/`.
 
-*Built with Tauri v2 -- MDViewer+ 1.0.0*
+### Development
+
+```bash
+npm run dev
+```
+
+## Keyboard Shortcuts
+
+| Action | Shortcut |
+|--------|----------|
+| Toggle View Mode | `Ctrl+E` |
+| Open | `Ctrl+O` |
+| Save | `Ctrl+S` |
+| Save As | `Ctrl+Shift+S` |
+| Reload | `Ctrl+R` |
+| Find | `Ctrl+F` |
+| Bold | `Ctrl+B` |
+| Italic | `Ctrl+I` |
+| Link | `Ctrl+K` |
+| Zoom In | `Ctrl++` |
+| Zoom Out | `Ctrl+-` |
+| Actual Size | `Ctrl+0` |
+| System Appearance | `Ctrl+Shift+0` |
+| Light Mode | `Ctrl+Shift+1` |
+| Dark Mode | `Ctrl+Shift+2` |
+
+## Dependencies
+
+| Library | Purpose |
+|---------|---------|
+| [Tauri v2](https://v2.tauri.app) | Native window, menus, file system |
+| [CodeMirror 6](https://codemirror.net) | Markdown editor |
+| [marked](https://github.com/markedjs/marked) | Markdown to HTML |
+| [esbuild](https://esbuild.github.io) | JS bundling |
+
+## License
+
+[MIT](LICENSE)

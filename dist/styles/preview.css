@@ -46,6 +46,9 @@ body[data-theme="dark"] #preview-content {
   background-color: var(--color-bg);
   padding: 32px 48px;
   word-wrap: break-word;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
 }
 
 #preview-content h1,
@@ -136,6 +139,22 @@ body[data-theme="dark"] #preview-content {
 
 #preview-content img { max-width: 100%; height: auto; }
 #preview-content input[type="checkbox"] { margin-right: 0.5em; }
+
+/* Text selection highlight */
+#preview-content ::selection {
+  background-color: #0969da;
+  color: #ffffff;
+}
+body[data-theme="dark"] #preview-content ::selection {
+  background-color: #58a6ff;
+  color: #0d1117;
+}
+@media (prefers-color-scheme: dark) {
+  body[data-theme="system"] #preview-content ::selection {
+    background-color: #58a6ff;
+    color: #0d1117;
+  }
+}
 
 /* Preview pane background matches preview content */
 #preview-pane {

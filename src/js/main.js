@@ -14,7 +14,7 @@ import { initZoom, zoomIn, zoomOut, zoomReset, setActivePane, getPreviewZoom, ge
 
 // App state
 let currentFilePath = null;
-let viewMode = 'split';
+let viewMode = 'view';
 const viewModes = ['view', 'split', 'edit'];
 
 // Scroll sync
@@ -26,7 +26,7 @@ async function init() {
   try {
     settings = await invoke('get_settings');
   } catch {
-    settings = { appearance: 'system', zoom_level: 1.0, editor_font_size: 14.0, view_mode: 'split' };
+    settings = { appearance: 'system', zoom_level: 1.0, editor_font_size: 14.0, view_mode: 'view' };
   }
 
   // Init theme

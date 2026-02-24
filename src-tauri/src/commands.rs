@@ -17,7 +17,7 @@ impl Default for AppSettings {
             appearance: "system".into(),
             zoom_level: 1.0,
             editor_font_size: 14.0,
-            view_mode: "split".into(),
+            view_mode: "view".into(),
         }
     }
 }

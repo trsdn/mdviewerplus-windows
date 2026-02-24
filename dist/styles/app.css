@@ -1,0 +1,107 @@
+/* App Layout */
+:root {
+  --splitter-width: 6px;
+  --editor-bg-light: #ffffff;
+  --editor-bg-dark: #0d1117;
+  --splitter-bg-light: #d0d7de;
+  --splitter-bg-dark: #30363d;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+}
+
+/* Theme backgrounds */
+body[data-theme="light"], body[data-theme="system"] {
+  background: var(--editor-bg-light);
+}
+body[data-theme="dark"] {
+  background: var(--editor-bg-dark);
+}
+@media (prefers-color-scheme: dark) {
+  body[data-theme="system"] {
+    background: var(--editor-bg-dark);
+  }
+}
+
+#app {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+/* Editor pane */
+#editor-pane {
+  flex: 1;
+  min-width: 200px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#editor {
+  flex: 1;
+  overflow: auto;
+}
+
+#editor .cm-editor {
+  height: 100%;
+}
+
+#editor .cm-scroller {
+  overflow: auto;
+}
+
+/* Splitter */
+#splitter {
+  width: var(--splitter-width);
+  cursor: col-resize;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+body[data-theme="light"] #splitter,
+body[data-theme="system"] #splitter {
+  background: var(--splitter-bg-light);
+}
+body[data-theme="dark"] #splitter {
+  background: var(--splitter-bg-dark);
+}
+@media (prefers-color-scheme: dark) {
+  body[data-theme="system"] #splitter {
+    background: var(--splitter-bg-dark);
+  }
+}
+
+#splitter:hover, #splitter.dragging {
+  background: #0969da;
+}
+
+/* Preview pane */
+#preview-pane {
+  flex: 1;
+  min-width: 200px;
+  overflow: auto;
+}
+
+#preview-content {
+  transform-origin: top left;
+}
+
+/* View mode: view (preview only) */
+body[data-view-mode="view"] #editor-pane,
+body[data-view-mode="view"] #splitter {
+  display: none;
+}
+
+/* View mode: edit (editor only) */
+body[data-view-mode="edit"] #preview-pane,
+body[data-view-mode="edit"] #splitter {
+  display: none;
+}
+
+/* View mode: split (both visible) — default, no overrides needed */

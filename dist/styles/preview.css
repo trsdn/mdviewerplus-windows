@@ -1,0 +1,151 @@
+/* GFM Preview Styles — extracted from macOS MDViewer+ template.html */
+
+/* Light mode (default) */
+#preview-content {
+  --color-bg: #ffffff;
+  --color-fg: #24292f;
+  --color-border: #d0d7de;
+  --color-code-bg: #f6f8fa;
+  --color-link: #0969da;
+  --color-blockquote-fg: #656d76;
+  --color-blockquote-border: #d0d7de;
+  --color-hr: #d8dee4;
+}
+
+/* Dark mode */
+body[data-theme="dark"] #preview-content {
+  --color-bg: #0d1117;
+  --color-fg: #e6edf3;
+  --color-border: #30363d;
+  --color-code-bg: #161b22;
+  --color-link: #58a6ff;
+  --color-blockquote-fg: #8b949e;
+  --color-blockquote-border: #30363d;
+  --color-hr: #21262d;
+}
+
+/* System theme: dark mode */
+@media (prefers-color-scheme: dark) {
+  body[data-theme="system"] #preview-content {
+    --color-bg: #0d1117;
+    --color-fg: #e6edf3;
+    --color-border: #30363d;
+    --color-code-bg: #161b22;
+    --color-link: #58a6ff;
+    --color-blockquote-fg: #8b949e;
+    --color-blockquote-border: #30363d;
+    --color-hr: #21262d;
+  }
+}
+
+#preview-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-fg);
+  background-color: var(--color-bg);
+  padding: 32px 48px;
+  word-wrap: break-word;
+}
+
+#preview-content h1,
+#preview-content h2,
+#preview-content h3,
+#preview-content h4,
+#preview-content h5,
+#preview-content h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+#preview-content h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--color-border); }
+#preview-content h2 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid var(--color-border); }
+#preview-content h3 { font-size: 1.25em; }
+#preview-content h4 { font-size: 1em; }
+
+#preview-content p { margin-top: 0; margin-bottom: 16px; }
+
+#preview-content a { color: var(--color-link); text-decoration: none; }
+#preview-content a:hover { text-decoration: underline; }
+
+#preview-content code {
+  font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 85%;
+  background-color: var(--color-code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+}
+
+#preview-content pre {
+  background-color: var(--color-code-bg);
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  line-height: 1.45;
+}
+
+#preview-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 85%;
+}
+
+#preview-content blockquote {
+  margin: 0 0 16px 0;
+  padding: 0 1em;
+  color: var(--color-blockquote-fg);
+  border-left: 0.25em solid var(--color-blockquote-border);
+}
+
+#preview-content hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: var(--color-hr);
+  border: 0;
+  border-radius: 2px;
+}
+
+#preview-content ul,
+#preview-content ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 2em;
+}
+
+#preview-content li + li { margin-top: 0.25em; }
+
+#preview-content table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 16px;
+  width: auto;
+  overflow: auto;
+}
+
+#preview-content th,
+#preview-content td {
+  padding: 6px 13px;
+  border: 1px solid var(--color-border);
+}
+
+#preview-content th { font-weight: 600; }
+#preview-content tr:nth-child(2n) { background-color: var(--color-code-bg); }
+
+#preview-content img { max-width: 100%; height: auto; }
+#preview-content input[type="checkbox"] { margin-right: 0.5em; }
+
+/* Preview pane background matches preview content */
+#preview-pane {
+  background-color: #ffffff;
+}
+body[data-theme="dark"] #preview-pane {
+  background-color: #0d1117;
+}
+@media (prefers-color-scheme: dark) {
+  body[data-theme="system"] #preview-pane {
+    background-color: #0d1117;
+  }
+}

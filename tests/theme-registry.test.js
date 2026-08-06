@@ -153,7 +153,7 @@ test('Windows integration keeps trusted syntax, dialog, and release safeguards',
     appStyles,
     /\.button-primary\s*\{[^}]*color: var\(--theme-selection-foreground\);[^}]*background: var\(--theme-selection-background\);/s,
   );
-  assert.match(workflow, /RELEASE_TAG: \$\{\{ github\.ref_name \}\}/);
+  assert.match(workflow, /RELEASE_TAG: \$\{\{ steps\.release\.outputs\.tag \}\}/);
   assert.match(workflow, /\$env:RELEASE_TAG -cnotmatch '\^v\[0-9\]\+\\\.\[0-9\]\+\\\.\[0-9\]\+\$'/);
   assert.doesNotMatch(
     workflow.slice(workflow.indexOf('- name: Create release and attach installers')),

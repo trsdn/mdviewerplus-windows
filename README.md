@@ -86,10 +86,6 @@ The appearance shortcuts are unchanged. They select the mode while retaining the
 | Light Mode | `Ctrl+Shift+1` |
 | Dark Mode | `Ctrl+Shift+2` |
 
-## Community thanks
-
-Explicit thanks to [@asherweintraub](https://github.com/asherweintraub) for the theme/settings inspiration in the [asherweintraub/mdviewer fork](https://github.com/asherweintraub/mdviewer), and to [@ulfendk](https://github.com/ulfendk) for the Sepia inspiration in the [ulfendk/mdviewer fork](https://github.com/ulfendk/mdviewer). This Windows implementation is adapted to the current Tauri and CodeMirror architecture.
-
 ## Dependencies
 
 | Library | Purpose |

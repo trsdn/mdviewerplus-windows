@@ -7,11 +7,14 @@ const handlers = {};
 
 // Direct keyboard shortcuts (fallback if menu accelerators don't fire events)
 const keyboardShortcuts = {
+  'ctrl+n': 'new',
   'ctrl+e': 'toggle_edit_mode',
   'ctrl+o': 'open',
   'ctrl+s': 'save',
   'ctrl+shift+s': 'save_as',
   'ctrl+r': 'reload',
+  'ctrl+alt+arrowleft': 'previous_file',
+  'ctrl+alt+arrowright': 'next_file',
   'ctrl+f': 'find',
   'ctrl+b': 'format_bold',
   'ctrl+i': 'format_italic',

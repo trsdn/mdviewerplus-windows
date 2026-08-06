@@ -17,6 +17,9 @@ The Windows port of [MDViewer+](https://github.com/trsdn/mdviewerplus) — a min
 - **Context-aware zoom** — `Ctrl+`/`Ctrl-` targets the active pane
 - **File associations** — open `.md` files directly from Explorer
 - **Native file handling** — Open, Save, Save As, Reload
+- **New documents** — create an untitled Markdown document with `Ctrl+N`; Save uses Save As until it has a path
+- **Sibling navigation** — move through visible Markdown files in the current folder without wrapping
+- **Unsaved-change protection** — New, Open, Reload, navigation, and window close confirm before discarding edits
 
 ## Appearance and palettes
 
@@ -70,11 +73,14 @@ The appearance shortcuts are unchanged. They select the mode while retaining the
 
 | Action | Shortcut |
 |---|---|
+| New File | `Ctrl+N` |
 | Toggle View Mode | `Ctrl+E` |
 | Open | `Ctrl+O` |
 | Save | `Ctrl+S` |
 | Save As | `Ctrl+Shift+S` |
 | Reload | `Ctrl+R` |
+| Previous Markdown File | `Ctrl+Alt+Left` |
+| Next Markdown File | `Ctrl+Alt+Right` |
 | Find | `Ctrl+F` |
 | Bold | `Ctrl+B` |
 | Italic | `Ctrl+I` |

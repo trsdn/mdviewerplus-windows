@@ -3,8 +3,21 @@ use tauri::{AppHandle, Emitter, Runtime};
 
 pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let file_menu = SubmenuBuilder::new(app, "File")
-        .item(&MenuItemBuilder::with_id("open", "Open…").accelerator("CmdOrCtrl+O").build(app)?)
-        .item(&MenuItemBuilder::with_id("save", "Save").accelerator("CmdOrCtrl+S").build(app)?)
+        .item(
+            &MenuItemBuilder::with_id("new", "New File")
+                .accelerator("CmdOrCtrl+N")
+                .build(app)?,
+        )
+        .item(
+            &MenuItemBuilder::with_id("open", "Open…")
+                .accelerator("CmdOrCtrl+O")
+                .build(app)?,
+        )
+        .item(
+            &MenuItemBuilder::with_id("save", "Save")
+                .accelerator("CmdOrCtrl+S")
+                .build(app)?,
+        )
         .item(
             &MenuItemBuilder::with_id("save_as", "Save As…")
                 .accelerator("CmdOrCtrl+Shift+S")
@@ -17,7 +30,18 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 .build(app)?,
         )
         .separator()
-        .quit()
+        .item(
+            &MenuItemBuilder::with_id("previous_file", "Previous Markdown File")
+                .accelerator("CmdOrCtrl+Alt+Left")
+                .build(app)?,
+        )
+        .item(
+            &MenuItemBuilder::with_id("next_file", "Next Markdown File")
+                .accelerator("CmdOrCtrl+Alt+Right")
+                .build(app)?,
+        )
+        .separator()
+        .item(&MenuItemBuilder::with_id("quit", "Quit").build(app)?)
         .build()?;
 
     let edit_menu = SubmenuBuilder::new(app, "Edit")

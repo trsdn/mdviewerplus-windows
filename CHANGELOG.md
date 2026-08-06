@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0
+
+- Added `Ctrl+N` New File with untitled-document Save As behavior.
+- Added explicit dirty tracking and confirmation before discarding changes through New, Open, Reload, sibling navigation, file-association/CLI opens, or window close.
+- Added deterministic Previous/Next Markdown File navigation with `Ctrl+Alt+Left` and `Ctrl+Alt+Right`.
+- Added user-visible file operation errors and automated frontend/Rust navigation policy tests.
+
+Sibling navigation was informed by [sdkks/mdviewer](https://github.com/sdkks/mdviewer). Thanks to @sdkks for the downstream implementation input and @sakkas-zendesk for the original request.
+
 ## 1.1.0
 
 - Added System, Light, and Dark appearance settings with separate preferred palettes.

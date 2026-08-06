@@ -1,10 +1,19 @@
 mod commands;
 mod menu;
 
-use tauri::{Emitter, Manager};
+use std::path::PathBuf;
+use tauri::Manager;
 
 pub fn run() {
+    let startup_file = std::env::args_os()
+        .nth(1)
+        .map(PathBuf::from)
+        .filter(|path| path.is_file())
+        .and_then(|path| path.canonicalize().ok())
+        .map(|path| path.to_string_lossy().into_owned());
+
     tauri::Builder::default()
+        .manage(commands::PendingStartupFile::new(startup_file))
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
@@ -13,6 +22,8 @@ pub fn run() {
             commands::read_file,
             commands::write_file,
             commands::resolve_base_url,
+            commands::take_startup_file,
+            commands::sibling_markdown_file,
             commands::get_settings,
             commands::save_settings,
         ])
@@ -26,21 +37,6 @@ pub fn run() {
             }
 
             menu::setup_menu_events(&handle);
-
-            // Check for file argument (open with / file association)
-            let args: Vec<String> = std::env::args().collect();
-            if args.len() > 1 {
-                let file_path = &args[1];
-                if std::path::Path::new(file_path).exists() {
-                    let handle_clone = handle.clone();
-                    let file_path = file_path.clone();
-                    // Emit after a short delay to ensure frontend is ready
-                    std::thread::spawn(move || {
-                        std::thread::sleep(std::time::Duration::from_millis(500));
-                        let _ = handle_clone.emit("open-file", file_path);
-                    });
-                }
-            }
 
             Ok(())
         })

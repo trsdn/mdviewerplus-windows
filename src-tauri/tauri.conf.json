@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/main/crates/tauri-utils/schema.json",
   "productName": "MDViewer+",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "identifier": "com.mdviewerplus.windows",
   "build": {
     "frontendDist": "../dist",

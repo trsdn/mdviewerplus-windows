@@ -70,6 +70,8 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 .accelerator("CmdOrCtrl+Shift+2")
                 .build(app)?,
         )
+        .separator()
+        .item(&MenuItemBuilder::with_id("theme_settings", "Theme Settings…").build(app)?)
         .build()?;
 
     let view_menu = SubmenuBuilder::new(app, "View")

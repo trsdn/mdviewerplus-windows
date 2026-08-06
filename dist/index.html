@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles/preview.css">
   <link rel="stylesheet" href="styles/editor-theme.css">
 </head>
-<body data-view-mode="view" data-theme="system">
+<body data-view-mode="view" data-appearance="system" data-theme="light" data-theme-id="github-light">
   <div id="app">
     <div id="editor-pane">
       <div id="editor"></div>
@@ -18,6 +18,34 @@
       <div id="preview-content"></div>
     </div>
   </div>
+  <dialog id="appearance-settings" aria-labelledby="appearance-settings-title">
+    <form method="dialog">
+      <div class="settings-dialog__header">
+        <h1 id="appearance-settings-title">Appearance Settings</h1>
+        <p>Choose how MDViewer+ follows Windows and which trusted palettes it uses.</p>
+      </div>
+
+      <label for="appearance-mode">Appearance</label>
+      <select id="appearance-mode" name="appearance"></select>
+
+      <label for="light-theme">Light theme</label>
+      <div class="theme-picker">
+        <select id="light-theme" name="light-theme"></select>
+        <span id="light-theme-swatch" class="theme-swatch" aria-label="Light theme color preview"></span>
+      </div>
+
+      <label for="dark-theme">Dark theme</label>
+      <div class="theme-picker">
+        <select id="dark-theme" name="dark-theme"></select>
+        <span id="dark-theme-swatch" class="theme-swatch" aria-label="Dark theme color preview"></span>
+      </div>
+
+      <div class="settings-dialog__actions">
+        <button id="appearance-cancel" type="button">Cancel</button>
+        <button class="button-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
   <script src="bundle.js" type="module"></script>
 </body>
 </html>

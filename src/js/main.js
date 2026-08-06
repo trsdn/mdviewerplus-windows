@@ -9,7 +9,8 @@ import { initEditor, setContent, getContent, setFontSize, formatBold, formatItal
 import { initPreview, renderMarkdown, setBaseDir, getPreviewPane } from './preview.js';
 import { initSplitPane } from './split-pane.js';
 import { initShortcuts, onMenuEvent } from './shortcuts.js';
-import { initTheme, setTheme, getTheme, isDark } from './theme.js';
+import { initTheme, setTheme, setThemeSettings, getThemeSettings } from './theme.js';
+import { initAppearanceSettings, openAppearanceSettings } from './appearance-settings.js';
 import { initZoom, zoomIn, zoomOut, zoomReset, setActivePane, getPreviewZoom, getEditorFontSize, getActivePane } from './zoom.js';
 
 // App state
@@ -26,12 +27,20 @@ async function init() {
   try {
     settings = await invoke('get_settings');
   } catch {
-    settings = { appearance: 'system', zoom_level: 1.0, editor_font_size: 14.0, view_mode: 'view' };
+    settings = {
+      appearance: 'system',
+      light_theme: 'github-light',
+      dark_theme: 'github-dark',
+      zoom_level: 1.0,
+      editor_font_size: 14.0,
+      view_mode: 'view',
+    };
   }
 
   // Init theme
-  initTheme(settings.appearance, (dark) => {
-    // Theme changed — save settings
+  initTheme(settings);
+  initAppearanceSettings((themeSettings) => {
+    setThemeSettings(themeSettings);
     saveSettings();
   });
 
@@ -108,6 +117,7 @@ function wireMenuEvents() {
   onMenuEvent('theme_system', () => { setTheme('system'); saveSettings(); });
   onMenuEvent('theme_light', () => { setTheme('light'); saveSettings(); });
   onMenuEvent('theme_dark', () => { setTheme('dark'); saveSettings(); });
+  onMenuEvent('theme_settings', () => openAppearanceSettings(getThemeSettings()));
 }
 
 function updateEditorZoom() {
@@ -213,9 +223,10 @@ function setupScrollSync() {
 
 async function saveSettings() {
   try {
+    const themeSettings = getThemeSettings();
     await invoke('save_settings', {
       settings: {
-        appearance: getTheme(),
+        ...themeSettings,
         zoom_level: getPreviewZoom(),
         editor_font_size: getEditorFontSize(),
         view_mode: viewMode,

@@ -3,14 +3,30 @@
 import { EditorState, Compartment } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, drawSelection, highlightSpecialChars } from '@codemirror/view';
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
-import { defaultHighlightStyle, syntaxHighlighting, HighlightStyle } from '@codemirror/language';
+import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 import { searchKeymap, openSearchPanel } from '@codemirror/search';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { tags } from '@lezer/highlight';
 
 let editorView = null;
 let fontSizeCompartment = new Compartment();
-let themeCompartment = new Compartment();
 let onChangeCallback = null;
+
+const markdownHighlightStyle = HighlightStyle.define([
+  { tag: tags.heading, color: 'var(--theme-link)', fontWeight: '700' },
+  { tag: tags.strong, fontWeight: '700' },
+  { tag: tags.emphasis, fontStyle: 'italic' },
+  { tag: [tags.link, tags.url], color: 'var(--theme-link)' },
+  {
+    tag: tags.monospace,
+    color: 'var(--theme-code-foreground)',
+    backgroundColor: 'var(--theme-code-background)',
+    borderRadius: '3px',
+  },
+  { tag: tags.quote, color: 'var(--theme-blockquote-foreground)' },
+  { tag: tags.list, color: 'var(--theme-link)' },
+  { tag: tags.contentSeparator, color: 'var(--theme-link)' },
+]);
 
 export function initEditor(container, onChange) {
   onChangeCallback = onChange;
@@ -30,8 +46,7 @@ export function initEditor(container, onChange) {
       drawSelection(),
       history(),
       markdown({ base: markdownLanguage }),
-      syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-      themeCompartment.of([]),
+      syntaxHighlighting(markdownHighlightStyle),
       fontSizeCompartment.of(EditorView.theme({
         '.cm-content': { fontSize: '14px' },
         '.cm-gutters': { fontSize: '14px' },

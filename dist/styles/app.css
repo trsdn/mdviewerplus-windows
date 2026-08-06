@@ -1,46 +1,43 @@
-/* App Layout */
 :root {
   --splitter-width: 6px;
-  --editor-bg-light: #ffffff;
-  --editor-bg-dark: #0d1117;
-  --splitter-bg-light: #d0d7de;
-  --splitter-bg-dark: #30363d;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
 }
 
-/* Theme backgrounds */
-body[data-theme="light"], body[data-theme="system"] {
-  background: var(--editor-bg-light);
+body {
+  color: var(--theme-foreground);
+  background: var(--theme-background);
 }
-body[data-theme="dark"] {
-  background: var(--editor-bg-dark);
-}
-@media (prefers-color-scheme: dark) {
-  body[data-theme="system"] {
-    background: var(--editor-bg-dark);
-  }
+
+body ::selection {
+  color: var(--theme-selection-foreground);
+  background: var(--theme-selection-background);
 }
 
 #app {
   display: flex;
-  height: 100%;
   width: 100%;
+  height: 100%;
+  background: var(--theme-background);
 }
 
-/* Editor pane */
 #editor-pane {
+  display: flex;
   flex: 1;
+  flex-direction: column;
   min-width: 200px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
 #editor {
@@ -56,52 +53,150 @@ body[data-theme="dark"] {
   overflow: auto;
 }
 
-/* Splitter */
 #splitter {
+  flex-shrink: 0;
   width: var(--splitter-width);
   cursor: col-resize;
-  flex-shrink: 0;
   user-select: none;
+  background: var(--theme-splitter);
 }
 
-body[data-theme="light"] #splitter,
-body[data-theme="system"] #splitter {
-  background: var(--splitter-bg-light);
-}
-body[data-theme="dark"] #splitter {
-  background: var(--splitter-bg-dark);
-}
-@media (prefers-color-scheme: dark) {
-  body[data-theme="system"] #splitter {
-    background: var(--splitter-bg-dark);
-  }
+#splitter:hover,
+#splitter.dragging {
+  background: var(--theme-splitter-hover);
 }
 
-#splitter:hover, #splitter.dragging {
-  background: #0969da;
-}
-
-/* Preview pane */
 #preview-pane {
   flex: 1;
   min-width: 200px;
   overflow: auto;
+  background: var(--theme-background);
 }
 
 #preview-content {
   transform-origin: top left;
 }
 
-/* View mode: view (preview only) */
 body[data-view-mode="view"] #editor-pane,
-body[data-view-mode="view"] #splitter {
-  display: none;
-}
-
-/* View mode: edit (editor only) */
+body[data-view-mode="view"] #splitter,
 body[data-view-mode="edit"] #preview-pane,
 body[data-view-mode="edit"] #splitter {
   display: none;
 }
 
-/* View mode: split (both visible) — default, no overrides needed */
+dialog {
+  width: min(480px, calc(100vw - 32px));
+  margin: auto;
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px color-mix(in srgb, var(--theme-foreground) 24%, transparent);
+}
+
+dialog::backdrop {
+  background: color-mix(in srgb, var(--theme-foreground) 35%, transparent);
+}
+
+.settings-dialog__header {
+  margin-bottom: 22px;
+}
+
+.settings-dialog__header h1 {
+  margin-bottom: 6px;
+  font-size: 1.3rem;
+}
+
+.settings-dialog__header p {
+  color: var(--theme-blockquote-foreground);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+#appearance-settings form {
+  display: grid;
+  gap: 8px;
+  padding: 24px;
+}
+
+#appearance-settings label {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+#appearance-settings select,
+#appearance-settings button {
+  min-height: 36px;
+  color: var(--theme-code-foreground);
+  background: var(--theme-code-background);
+  border: 1px solid var(--theme-code-foreground);
+  border-radius: 6px;
+  font: inherit;
+}
+
+#appearance-settings select {
+  width: 100%;
+  padding: 6px 10px;
+}
+
+#appearance-settings button {
+  min-width: 84px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+#appearance-settings .button-primary {
+  color: var(--theme-selection-foreground);
+  background: var(--theme-selection-background);
+  border-color: var(--theme-selection-foreground);
+}
+
+#appearance-settings :focus-visible {
+  outline: 2px solid var(--theme-splitter-hover);
+  outline-offset: 2px;
+}
+
+.theme-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  gap: 10px;
+  align-items: center;
+}
+
+.theme-swatch {
+  display: flex;
+  height: 30px;
+  overflow: hidden;
+  border: 1px solid var(--theme-border);
+  border-radius: 6px;
+}
+
+.theme-swatch__color {
+  flex: 1;
+}
+
+.settings-dialog__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+
+@media (max-width: 520px) {
+  .theme-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-swatch {
+    width: 88px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

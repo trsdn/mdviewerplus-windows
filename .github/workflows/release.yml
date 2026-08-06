@@ -1,0 +1,83 @@
+name: Windows Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run frontend tests
+        run: npm test
+
+      - name: Run Rust tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Build NSIS and MSI installers
+        run: npm run build
+
+      - name: Collect installers and SHA-256 checksums
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path artifacts -Force | Out-Null
+          $installers = @(
+            Get-ChildItem "src-tauri/target/release/bundle/nsis/*.exe"
+            Get-ChildItem "src-tauri/target/release/bundle/msi/*.msi"
+          )
+          if ($installers.Count -lt 2) {
+            throw "Expected both NSIS and MSI installers."
+          }
+          foreach ($installer in $installers) {
+            $destination = Join-Path "artifacts" $installer.Name
+            Copy-Item $installer.FullName $destination
+            $hash = (Get-FileHash $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+            [IO.File]::WriteAllText(
+              "$destination.sha256",
+              "$hash *$($installer.Name)`n",
+              [Text.Encoding]::ASCII
+            )
+          }
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mdviewerplus-windows-${{ github.ref_name }}
+          path: artifacts/*
+          if-no-files-found: error
+
+      - name: Create release and attach installers
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if ($env:RELEASE_TAG -cnotmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
+            throw "Invalid release tag: $env:RELEASE_TAG"
+          }
+          gh release view $env:RELEASE_TAG *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $env:RELEASE_TAG --verify-tag --generate-notes --title "MDViewer+ $env:RELEASE_TAG"
+          }
+          $assets = Get-ChildItem artifacts -File | ForEach-Object { $_.FullName }
+          gh release upload $env:RELEASE_TAG $assets --clobber

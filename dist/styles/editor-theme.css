@@ -1,61 +1,12 @@
-/* CodeMirror GitHub-Inspired Theme — mapped from MarkdownSyntaxHighlighter.swift */
-
-/* Light mode */
 .cm-editor {
-  --cm-bg: #ffffff;
-  --cm-fg: #24292f;
-  --cm-accent: #0969da;
-  --cm-code: rgba(36, 41, 47, 0.85);
-  --cm-code-bg: #f6f8fa;
-  --cm-muted: #656d76;
-  --cm-selection: #0969da20;
-  --cm-cursor: #24292f;
-  --cm-active-line: #f6f8fa;
-  --cm-gutter-bg: #ffffff;
-  --cm-gutter-fg: #8b949e;
-}
-
-/* Dark mode */
-body[data-theme="dark"] .cm-editor {
-  --cm-bg: #0d1117;
-  --cm-fg: #e6edf3;
-  --cm-accent: #58a6ff;
-  --cm-code: rgba(230, 237, 243, 0.85);
-  --cm-code-bg: #161b22;
-  --cm-muted: #8b949e;
-  --cm-selection: #58a6ff20;
-  --cm-cursor: #e6edf3;
-  --cm-active-line: #161b22;
-  --cm-gutter-bg: #0d1117;
-  --cm-gutter-fg: #656d76;
-}
-
-@media (prefers-color-scheme: dark) {
-  body[data-theme="system"] .cm-editor {
-    --cm-bg: #0d1117;
-    --cm-fg: #e6edf3;
-    --cm-accent: #58a6ff;
-    --cm-code: rgba(230, 237, 243, 0.85);
-    --cm-code-bg: #161b22;
-    --cm-muted: #8b949e;
-    --cm-selection: #58a6ff20;
-    --cm-cursor: #e6edf3;
-    --cm-active-line: #161b22;
-    --cm-gutter-bg: #0d1117;
-    --cm-gutter-fg: #656d76;
-  }
-}
-
-/* Base editor */
-.cm-editor {
-  background-color: var(--cm-bg);
-  color: var(--cm-fg);
+  color: var(--theme-foreground);
+  background-color: var(--theme-background);
 }
 
 .cm-editor .cm-content {
-  caret-color: var(--cm-cursor);
-  font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   padding: 16px 0;
+  caret-color: var(--theme-caret);
+  font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 .cm-editor .cm-line {
@@ -63,58 +14,59 @@ body[data-theme="dark"] .cm-editor {
 }
 
 .cm-editor .cm-gutters {
-  background-color: var(--cm-gutter-bg);
-  color: var(--cm-gutter-fg);
-  border-right: none;
+  color: var(--theme-gutter-foreground);
+  background-color: var(--theme-gutter-background);
+  border-right: 1px solid var(--theme-border);
 }
 
-.cm-editor .cm-activeLineGutter {
-  background-color: var(--cm-active-line);
-}
-
+.cm-editor .cm-activeLineGutter,
 .cm-editor .cm-activeLine {
-  background-color: var(--cm-active-line);
+  background-color: var(--theme-active-line);
 }
 
-.cm-editor .cm-selectionBackground,
-.cm-editor ::selection {
-  background-color: var(--cm-selection) !important;
+.cm-editor .cm-selectionBackground {
+  background-color: var(--theme-selection-background) !important;
 }
 
-.cm-editor .cm-cursor {
-  border-left-color: var(--cm-cursor);
+.cm-editor .cm-content ::selection {
+  color: var(--theme-selection-foreground);
+  background-color: var(--theme-selection-background);
 }
 
-/* Markdown syntax highlighting */
-.cm-editor .tok-heading { color: var(--cm-accent); font-weight: bold; }
-.cm-editor .tok-strong { font-weight: bold; }
-.cm-editor .tok-emphasis { font-style: italic; }
-.cm-editor .tok-link { color: var(--cm-accent); }
-.cm-editor .tok-url { color: var(--cm-accent); }
-.cm-editor .tok-monospace { color: var(--cm-code); background-color: var(--cm-code-bg); border-radius: 3px; padding: 0 2px; }
-.cm-editor .tok-quote { color: var(--cm-muted); }
-.cm-editor .tok-list { color: var(--cm-accent); }
+.cm-editor .cm-cursor,
+.cm-editor .cm-dropCursor {
+  border-left-color: var(--theme-caret);
+}
 
-/* CodeMirror markdown tokens (actual class names) */
-.cm-editor .ͼ7 { color: var(--cm-accent); font-weight: bold; } /* heading */
-.cm-editor .cm-header { color: var(--cm-accent); font-weight: bold; }
-
-/* Search panel styling */
 .cm-editor .cm-panels {
-  background-color: var(--cm-code-bg);
-  color: var(--cm-fg);
+  color: var(--theme-code-foreground);
+  background-color: var(--theme-code-background);
+  border-color: var(--theme-code-foreground);
+}
+
+.cm-editor .cm-panels input,
+.cm-editor .cm-panels button {
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
 }
 
 .cm-editor .cm-searchMatch {
-  background-color: #e8c56840;
-  outline: 1px solid #e8c568;
+  color: var(--theme-selection-foreground);
+  background-color: var(--theme-search-match);
+  outline: 1px solid var(--theme-horizontal-rule);
 }
 
 .cm-editor .cm-searchMatch-selected {
-  background-color: #0969da40;
+  color: var(--theme-selection-foreground);
+  background-color: var(--theme-search-match-selected);
 }
 
-/* Focused editor indicator */
 .cm-editor.cm-focused {
   outline: none;
+}
+
+.cm-editor .cm-scroller:focus-visible {
+  outline: 2px solid var(--theme-splitter-hover);
+  outline-offset: -2px;
 }

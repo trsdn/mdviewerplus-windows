@@ -1,12 +1,15 @@
 {
   "name": "mdviewerplus-windows",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "type": "module",
   "description": "MDViewer+ for Windows — Markdown viewer and editor",
   "scripts": {
-    "dev": "npm run build:frontend && cargo tauri dev",
-    "build": "npm run build:frontend && cargo tauri build",
+    "dev": "npm run build:frontend && tauri dev",
+    "build": "npm run build:frontend && tauri build",
     "build:frontend": "node esbuild.config.mjs",
-    "tauri": "cargo tauri"
+    "test": "node --test",
+    "test:frontend": "node --test",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@codemirror/commands": "^6",
@@ -15,6 +18,7 @@
     "@codemirror/search": "^6",
     "@codemirror/state": "^6",
     "@codemirror/view": "^6",
+    "@lezer/highlight": "^1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2",
     "@tauri-apps/plugin-fs": "^2",

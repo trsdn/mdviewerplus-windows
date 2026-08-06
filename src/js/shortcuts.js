@@ -19,6 +19,9 @@ const keyboardShortcuts = {
   'ctrl+=': 'zoom_in',
   'ctrl+-': 'zoom_out',
   'ctrl+0': 'zoom_reset',
+  'ctrl+shift+0': 'theme_system',
+  'ctrl+shift+1': 'theme_light',
+  'ctrl+shift+2': 'theme_dark',
 };
 
 export function initShortcuts() {

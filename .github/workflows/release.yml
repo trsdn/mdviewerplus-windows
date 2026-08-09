@@ -159,7 +159,7 @@ jobs:
               --verify-tag `
               --generate-notes `
               --title "MDViewer+ $env:RELEASE_TAG" `
-              --notes "Full is the recommended edition. Lite is the minimum-footprint edition. Windows installers are currently unsigned; verify the attached SHA-256 files before installation."
+              --notes "Full is the recommended edition. Lite is the minimum-footprint edition. Windows installers are currently unsigned; verify the attached SHA-256 files before installation.`n`nThanks to sdkks/mdviewer (https://github.com/sdkks/mdviewer) and jnscnn/mdviewer-plus-plus (https://github.com/jnscnn/mdviewer-plus-plus) for the implementation input behind several Lite/Full features in this release. See CHANGELOG.md for details."
           }
           $assets = Get-ChildItem artifacts -File | ForEach-Object { $_.FullName }
           gh release upload $env:RELEASE_TAG $assets --clobber

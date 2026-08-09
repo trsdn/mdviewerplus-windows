@@ -87,3 +87,26 @@ test('prepared WinGet manifests target only Full current-user NSIS and are not s
   assert.match(workflow, /winget validate/);
   assert.doesNotMatch(workflow, /wingetcreate\s+submit|microsoft\/winget-pkgs|gh pr create/i);
 });
+
+test('sdkks/jnscnn attribution appears only in release records, never README or Pages docs', async () => {
+  const attributionPattern = /sdkks|jnscnn/i;
+
+  const [changelog, releaseWorkflow] = await Promise.all([
+    readFile(path.join(root, 'CHANGELOG.md'), 'utf8'),
+    readFile(path.join(root, '.github/workflows/release.yml'), 'utf8'),
+  ]);
+  assert.match(changelog, /sdkks\/mdviewer/);
+  assert.match(changelog, /jnscnn\/mdviewer-plus-plus/);
+  assert.match(releaseWorkflow, /sdkks\/mdviewer/);
+  assert.match(releaseWorkflow, /jnscnn\/mdviewer-plus-plus/);
+
+  const readme = await readFile(path.join(root, 'README.md'), 'utf8');
+  assert.doesNotMatch(readme, attributionPattern);
+
+  const docsDir = path.join(root, 'docs');
+  const docsFiles = (await readdir(docsDir)).filter((name) => name.endsWith('.md'));
+  for (const file of docsFiles) {
+    const contents = await readFile(path.join(docsDir, file), 'utf8');
+    assert.doesNotMatch(contents, attributionPattern, file);
+  }
+});

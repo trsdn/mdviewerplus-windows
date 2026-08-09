@@ -17,6 +17,13 @@
 - Prepared but did not submit proposed `Trsdn.MDViewerPlus` WinGet manifests.
 - Preserved the explicit unsigned-installer disclosure and per-asset checksums.
 
+Several of this release's lightweight power features (footnotes, custom Prism
+highlighting, GitHub alerts/task lists, document outline, folder watcher) and
+the Full Mermaid rendering work were informed by
+[sdkks/mdviewer](https://github.com/sdkks/mdviewer) and
+[jnscnn/mdviewer-plus-plus](https://github.com/jnscnn/mdviewer-plus-plus).
+Thanks to @sdkks and @jnscnn for the implementation input.
+
 ## 1.2.0
 
 - Added `Ctrl+N` New File with untitled-document Save As behavior.

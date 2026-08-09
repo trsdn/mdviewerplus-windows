@@ -90,10 +90,10 @@ test('Tauri builds invoke the installed CLI without Windows command-shim spawnin
 
 test('MSI cross-edition verification forces same-version files to be replaced', async () => {
   const contents = await readFile(path.join(root, 'packaging', 'verify-cross-edition.ps1'), 'utf8');
-  assert.match(contents, /REINSTALL=ALL/);
-  assert.match(contents, /REINSTALLMODE=vamus/);
+  assert.match(contents, /"\/fvamus"/);
   assert.match(contents, /WindowsInstaller -eq 1/);
   assert.match(contents, /Get-InstalledHash \$true/);
+  assert.doesNotMatch(contents, /REINSTALL=ALL/);
   assert.doesNotMatch(contents, /REINSTALLMODE=vomus/);
 });
 

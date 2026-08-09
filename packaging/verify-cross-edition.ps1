@@ -76,9 +76,7 @@ if ($uninstaller) { Invoke-Installer $uninstaller.FullName @("/S") }
 
 Invoke-Installer "msiexec.exe" @("/i", "`"$LiteMsi`"", "/qn", "/norestart")
 $liteMsiHash = Get-InstalledHash $true
-Invoke-Installer "msiexec.exe" @(
-  "/i", "`"$FullMsi`"", "REINSTALL=ALL", "REINSTALLMODE=vamus", "/qn", "/norestart"
-)
+Invoke-Installer "msiexec.exe" @("/fvamus", "`"$FullMsi`"", "/qn", "/norestart")
 $fullMsiHash = Get-InstalledHash $true
 if ($liteMsiHash -eq $fullMsiHash) {
   throw "MSI cross-edition install did not replace the embedded application."

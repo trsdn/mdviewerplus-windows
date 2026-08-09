@@ -25,10 +25,10 @@ This Lite build bundles the packages listed below. Full license texts follow the
 | @tauri-apps/api | 2.10.1 | https://registry.npmjs.org/@tauri-apps/api/-/api-2.10.1.tgz | Apache-2.0 OR MIT | sha512-hKL/jWf293UDSUN09rR69hrToyIXBb8CjGaWC7gfinvnQrBVvnLr08FeFi38gxtugAVyVcTa5/FD/Xnkb1siBw== | Lite |
 | @tauri-apps/plugin-dialog | 2.6.0 | https://registry.npmjs.org/@tauri-apps/plugin-dialog/-/plugin-dialog-2.6.0.tgz | MIT OR Apache-2.0 | sha512-q4Uq3eY87TdcYzXACiYSPhmpBA76shgmQswGkSVio4C82Sz2W4iehe9TnKYwbq7weHiL88Yw19XZm7v28+Micg== | Lite |
 | crelt | 1.0.6 | https://registry.npmjs.org/crelt/-/crelt-1.0.6.tgz | MIT | sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g== | Lite |
-| dompurify | 3.4.12 | https://ms-feed-12.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/dompurify/-/dompurify-3.4.12.tgz | (MPL-2.0 OR Apache-2.0) | sha1-b6ImXpu9zogsSs5BB2JgUbRI/6g= | Lite |
+| dompurify | 3.4.12 | https://registry.npmjs.org/dompurify/-/dompurify-3.4.12.tgz | (MPL-2.0 OR Apache-2.0) | sha1-b6ImXpu9zogsSs5BB2JgUbRI/6g= | Lite |
 | marked | 15.0.7 | https://registry.npmjs.org/marked/-/marked-15.0.7.tgz | MIT | sha512-dgLIeKGLx5FwziAnsk4ONoGwHwGPJzselimvlVskE9XLN4Orv9u2VA3GWw/lYUqjfA0rUT/6fqKwfZJapP9BEg== | Lite |
-| marked-footnote | 1.4.0 | https://ms-feed-17.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/marked-footnote/-/marked-footnote-1.4.0.tgz | MIT | sha1-sI5hRWNP2F5JZYY2B9SvNcgvGdE= | Lite |
-| prismjs | 1.30.0 | https://ms-feed-2.pkgs.visualstudio.com/1es-public/_packaging/npm-public/npm/registry/prismjs/-/prismjs-1.30.0.tgz | MIT | sha1-2XCZadnU4WQD9vNIxjVTsZ8Jdak= | Lite |
+| marked-footnote | 1.4.0 | https://registry.npmjs.org/marked-footnote/-/marked-footnote-1.4.0.tgz | MIT | sha1-sI5hRWNP2F5JZYY2B9SvNcgvGdE= | Lite |
+| prismjs | 1.30.0 | https://registry.npmjs.org/prismjs/-/prismjs-1.30.0.tgz | MIT | sha1-2XCZadnU4WQD9vNIxjVTsZ8Jdak= | Lite |
 | style-mod | 4.1.3 | https://registry.npmjs.org/style-mod/-/style-mod-4.1.3.tgz | MIT | sha512-i/n8VsZydrugj3Iuzll8+x/00GH2vnYsk1eomD8QiRrSAeW6ItbCQDtfXCeJHd0iwiNagqjQkvpvREEPtW3IoQ== | Lite |
 | w3c-keyname | 2.2.8 | https://registry.npmjs.org/w3c-keyname/-/w3c-keyname-2.2.8.tgz | MIT | sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ== | Lite |
 

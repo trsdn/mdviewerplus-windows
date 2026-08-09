@@ -4,20 +4,20 @@
   "lite": {
     "entryJavaScript": 641120,
     "allJavaScript": 683212,
-    "allWebAssets": 758573,
+    "allWebAssets": 758394,
     "prismChunk": 10109,
     "bundledPackages": 27
   },
   "full": {
     "entryJavaScript": 641332,
     "allJavaScript": 4329611,
-    "allWebAssets": 4491932,
+    "allWebAssets": 4487925,
     "bundledPackages": 84
   },
   "fullMinusLite": {
     "entryJavaScript": 212,
     "allJavaScript": 3646399,
-    "allWebAssets": 3733359
+    "allWebAssets": 3729531
   },
   "assertions": {
     "liteFullOnlyViolations": [],

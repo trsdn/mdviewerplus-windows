@@ -154,7 +154,7 @@ Measurements from the current 2.0.0 source:
 |---|---:|---:|
 | Initial JavaScript entry | 626.1 KiB | 626.3 KiB |
 | All lazy-capable JavaScript | 667.2 KiB | 4,228.1 KiB |
-| All web assets and notices | 740.8 KiB | 4,386.7 KiB |
+| All web assets and notices | 740.6 KiB | 4,382.7 KiB |
 | Lite Prism chunk | 9.9 KiB | Not included |
 
 The 0.2 KiB initial-entry difference demonstrates that ordinary Full documents

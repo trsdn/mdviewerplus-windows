@@ -917,6 +917,44 @@ mod tests {
         let _ = fs::remove_file(outside);
     }
 
+    // This app ships only for Windows and its release CI runs exclusively on
+    // `windows-latest`, so the confinement check also needs first-class
+    // coverage against a real Windows filesystem symlink rather than relying
+    // solely on the Unix variant above, which never executes on that runner.
+    #[cfg(windows)]
+    #[test]
+    fn confined_resources_reject_symlink_escapes() {
+        use std::os::windows::fs::symlink_file;
+        let directory = TestDirectory::new();
+        let current = directory.file("current.md");
+        let outside = directory
+            .path()
+            .parent()
+            .unwrap()
+            .join(format!("outside-image-{}.png", std::process::id()));
+        fs::write(&outside, b"png").unwrap();
+        let link = directory.path().join("escape.png");
+        match symlink_file(&outside, &link) {
+            Ok(()) => {
+                assert!(matches!(
+                    resolve_confined_resource(&current, "escape.png"),
+                    Err(ResourceError::OutsideFolder(_))
+                ));
+            }
+            Err(error) => {
+                // Creating a filesystem symlink requires Developer Mode or an
+                // elevated account on some Windows hosts. windows-latest
+                // GitHub Actions runners grant this; only skip when the host
+                // truly cannot create one so the suite does not flake in a
+                // restricted sandbox.
+                eprintln!(
+                    "skipping symlink escape test: could not create a test symlink ({error})"
+                );
+            }
+        }
+        let _ = fs::remove_file(outside);
+    }
+
     #[test]
     fn local_image_types_exclude_svg() {
         assert_eq!(image_mime(Path::new("image.png")), Some("image/png"));

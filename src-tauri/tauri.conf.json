@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/main/crates/tauri-utils/schema.json",
+  "$schema": "https://schema.tauri.app/config/2",
   "productName": "MDViewer+",
   "version": "2.0.0",
   "identifier": "com.mdviewerplus.windows",
@@ -47,10 +47,5 @@
         "description": "Markdown Document"
       }
     ]
-  },
-  "plugins": {
-    "shell": {
-      "open": true
-    }
   }
 }

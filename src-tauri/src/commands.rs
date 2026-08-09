@@ -288,7 +288,7 @@ fn is_hidden_entry(entry: &fs::DirEntry) -> Result<bool, ResourceError> {
                 entry.path().display()
             ))
         })?;
-        return Ok(metadata.file_attributes() & FILE_ATTRIBUTE_HIDDEN != 0);
+        Ok(metadata.file_attributes() & FILE_ATTRIBUTE_HIDDEN != 0)
     }
 
     #[cfg(not(windows))]

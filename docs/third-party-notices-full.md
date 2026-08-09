@@ -25,8 +25,8 @@ This Full build bundles the packages listed below. Full license texts follow the
 | @lezer/markdown | 1.6.3 | https://registry.npmjs.org/@lezer/markdown/-/markdown-1.6.3.tgz | MIT | sha512-jpGm5Ps+XErS+xA4urw7ogEGkeZOahVQF21Z6oECF0sj+2liwZopd2+I8uH5I/vZsRuuze3OxBREIANLf6KKUw== | Full |
 | @marijn/find-cluster-break | 1.0.2 | https://registry.npmjs.org/@marijn/find-cluster-break/-/find-cluster-break-1.0.2.tgz | MIT | sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g== | Full |
 | @mermaid-js/parser | 1.2.0 | https://registry.npmjs.org/@mermaid-js/parser/-/parser-1.2.0.tgz | MIT | sha1-Jm1yjFTS1ANNJw+LMdeQ4mKWpfo= | Full |
-| @tauri-apps/api | 2.10.1 | https://registry.npmjs.org/@tauri-apps/api/-/api-2.10.1.tgz | Apache-2.0 OR MIT | sha512-hKL/jWf293UDSUN09rR69hrToyIXBb8CjGaWC7gfinvnQrBVvnLr08FeFi38gxtugAVyVcTa5/FD/Xnkb1siBw== | Full |
-| @tauri-apps/plugin-dialog | 2.6.0 | https://registry.npmjs.org/@tauri-apps/plugin-dialog/-/plugin-dialog-2.6.0.tgz | MIT OR Apache-2.0 | sha512-q4Uq3eY87TdcYzXACiYSPhmpBA76shgmQswGkSVio4C82Sz2W4iehe9TnKYwbq7weHiL88Yw19XZm7v28+Micg== | Full |
+| @tauri-apps/api | 2.11.1 | https://registry.npmjs.org/@tauri-apps/api/-/api-2.11.1.tgz | Apache-2.0 OR MIT | sha512-M2FPuYND2m+wh5hfW9ZpSdxMPdEJovPBWwoHJmwUpysTYNHaOkVFN419m/K0LIgjb/7KU2vBgsUepJWugQCvAA== | Full |
+| @tauri-apps/plugin-dialog | 2.7.2 | https://registry.npmjs.org/@tauri-apps/plugin-dialog/-/plugin-dialog-2.7.2.tgz | MIT OR Apache-2.0 | sha512-pX0IGm1I3I6wc+zeKYcq1GSqogK6okCNX5fOdaNU5ab1AjGS6l1E5wFNjEb7meg7ZFSp0JUs+0jQGQNyOvLrsg== | Full |
 | @upsetjs/venn.js | 2.0.0 | https://registry.npmjs.org/@upsetjs/venn.js/-/venn.js-2.0.0.tgz | MIT | sha1-O+GSA4zdqSeqT4siq1Gvgqv0fzQ= | Full |
 | cose-base | 1.0.3 | https://registry.npmjs.org/cose-base/-/cose-base-1.0.3.tgz | MIT | sha1-ZQM0tBuGlXilQzWLgM2n4Kvgpgo= | Full |
 | cose-base | 2.2.0 | https://registry.npmjs.org/cose-base/-/cose-base-2.2.0.tgz | MIT | sha1-HDlcNbbhC7g/l2nKi4F9YUrdXAE= | Full |
@@ -768,21 +768,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## @tauri-apps/api 2.10.1
+## @tauri-apps/api 2.11.1
 
 License: Apache-2.0 OR MIT
 
 Source: https://github.com/tauri-apps/tauri#readme
 
-Package checksum: sha512-hKL/jWf293UDSUN09rR69hrToyIXBb8CjGaWC7gfinvnQrBVvnLr08FeFi38gxtugAVyVcTa5/FD/Xnkb1siBw==
+Package checksum: sha512-M2FPuYND2m+wh5hfW9ZpSdxMPdEJovPBWwoHJmwUpysTYNHaOkVFN419m/K0LIgjb/7KU2vBgsUepJWugQCvAA==
 
 The package did not include a standalone notice file; see its source for the license text.
 
-## @tauri-apps/plugin-dialog 2.6.0
+## @tauri-apps/plugin-dialog 2.7.2
 
 License: MIT OR Apache-2.0
 
-Package checksum: sha512-q4Uq3eY87TdcYzXACiYSPhmpBA76shgmQswGkSVio4C82Sz2W4iehe9TnKYwbq7weHiL88Yw19XZm7v28+Micg==
+Package checksum: sha512-pX0IGm1I3I6wc+zeKYcq1GSqogK6okCNX5fOdaNU5ab1AjGS6l1E5wFNjEb7meg7ZFSp0JUs+0jQGQNyOvLrsg==
 
 ```text
 SPDXVersion: SPDX-2.1

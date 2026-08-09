@@ -81,6 +81,13 @@ test('command-line module entrypoints use cross-platform file URL conversion', a
   }
 });
 
+test('Tauri builds invoke the installed CLI without Windows command-shim spawning', async () => {
+  const contents = await readFile(path.join(root, 'scripts', 'build-tauri.mjs'), 'utf8');
+  assert.match(contents, /spawn\(process\.execPath,/);
+  assert.match(contents, /'@tauri-apps', 'cli', 'tauri\.js'/);
+  assert.doesNotMatch(contents, /npx\.cmd/);
+});
+
 test('prepared WinGet manifests target only Full current-user NSIS and are not submitted', async () => {
   const manifests = renderWinGetManifests({
     version: '2.0.0',

@@ -11,9 +11,9 @@ const edition = editionFromArgv(process.argv.slice(2));
 await buildFrontend(edition);
 
 const config = path.join('src-tauri', `tauri.${edition}.conf.json`);
-const command = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-const child = spawn(command, [
-  'tauri',
+const tauriCli = path.join(root, 'node_modules', '@tauri-apps', 'cli', 'tauri.js');
+const child = spawn(process.execPath, [
+  tauriCli,
   'build',
   '--config',
   config,

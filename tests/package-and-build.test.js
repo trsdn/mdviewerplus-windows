@@ -2,11 +2,12 @@ import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { auditEdition } from '../scripts/audit-artifacts.mjs';
 import { renderWinGetManifests } from '../scripts/generate-winget-manifests.mjs';
 
-const root = path.resolve(new URL('..', import.meta.url).pathname);
+const root = fileURLToPath(new URL('..', import.meta.url));
 
 test('all product manifests use version 2.0.0 and exact Full dependency pins', async () => {
   const [packageJson, cargo, tauri] = await Promise.all([

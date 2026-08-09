@@ -109,12 +109,21 @@ test('prepared WinGet manifests target only Full current-user NSIS and are not s
     installerSha256: 'A'.repeat(64),
   });
   const installer = manifests['Trsdn.MDViewerPlus.installer.yaml'];
+  assert.match(installer, /^# yaml-language-server: \$schema=https:\/\/aka\.ms\/winget-manifest\.installer\.1\.10\.0\.schema\.json/m);
   assert.match(installer, /InstallerType: nullsoft/);
   assert.match(installer, /Scope: user/);
   assert.match(installer, /Silent: \/S/);
   assert.match(installer, /UpgradeBehavior: install/);
   assert.match(installer, /InstallerSha256: A{64}/);
   assert.doesNotMatch(installer, /Lite|\.msi/);
+  assert.match(
+    manifests['Trsdn.MDViewerPlus.yaml'],
+    /^# yaml-language-server: \$schema=https:\/\/aka\.ms\/winget-manifest\.version\.1\.10\.0\.schema\.json/m,
+  );
+  assert.match(
+    manifests['Trsdn.MDViewerPlus.locale.en-US.yaml'],
+    /^# yaml-language-server: \$schema=https:\/\/aka\.ms\/winget-manifest\.defaultLocale\.1\.10\.0\.schema\.json/m,
+  );
 
   const workflow = await readFile(path.join(root, '.github/workflows/winget-manifests.yml'), 'utf8');
   assert.match(workflow, /workflow_dispatch/);

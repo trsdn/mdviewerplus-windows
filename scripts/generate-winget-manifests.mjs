@@ -6,6 +6,11 @@ import { fileURLToPath } from 'node:url';
 const IDENTIFIER = 'Trsdn.MDViewerPlus';
 const MANIFEST_VERSION = '1.10.0';
 
+function schemaHeader(type) {
+  return `# yaml-language-server: $schema=https://aka.ms/winget-manifest.${type}.${MANIFEST_VERSION}.schema.json
+`;
+}
+
 function assertInput(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -19,13 +24,15 @@ export function renderWinGetManifests({ version, installerUrl, installerSha256 }
   assertInput(/^[A-F0-9]{64}$/.test(installerSha256), 'Installer SHA-256 must be 64 uppercase hex characters.');
 
   return {
-    [`${IDENTIFIER}.yaml`]: `PackageIdentifier: ${IDENTIFIER}
+    [`${IDENTIFIER}.yaml`]: `${schemaHeader('version')}
+PackageIdentifier: ${IDENTIFIER}
 PackageVersion: ${version}
 DefaultLocale: en-US
 ManifestType: version
 ManifestVersion: ${MANIFEST_VERSION}
 `,
-    [`${IDENTIFIER}.installer.yaml`]: `PackageIdentifier: ${IDENTIFIER}
+    [`${IDENTIFIER}.installer.yaml`]: `${schemaHeader('installer')}
+PackageIdentifier: ${IDENTIFIER}
 PackageVersion: ${version}
 InstallerType: nullsoft
 Scope: user
@@ -45,7 +52,8 @@ Installers:
 ManifestType: installer
 ManifestVersion: ${MANIFEST_VERSION}
 `,
-    [`${IDENTIFIER}.locale.en-US.yaml`]: `PackageIdentifier: ${IDENTIFIER}
+    [`${IDENTIFIER}.locale.en-US.yaml`]: `${schemaHeader('defaultLocale')}
+PackageIdentifier: ${IDENTIFIER}
 PackageVersion: ${version}
 PackageLocale: en-US
 Publisher: Torsten Mahr

@@ -10,14 +10,14 @@
   },
   "full": {
     "entryJavaScript": 641332,
-    "allJavaScript": 4329611,
-    "allWebAssets": 4487925,
+    "allJavaScript": 4328793,
+    "allWebAssets": 4487107,
     "bundledPackages": 84
   },
   "fullMinusLite": {
     "entryJavaScript": 212,
-    "allJavaScript": 3646399,
-    "allWebAssets": 3729531
+    "allJavaScript": 3645581,
+    "allWebAssets": 3728713
   },
   "assertions": {
     "liteFullOnlyViolations": [],

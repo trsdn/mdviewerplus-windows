@@ -57,6 +57,9 @@ test('Mermaid implementation is lazy, bounded, SVG-sanitized, and has no export 
   assert.match(source, /sanitizeDiagramSvg\(result\.svg\)/);
   assert.match(source, /securityLevel: 'strict'/);
   assert.match(source, /htmlLabels: false/);
+  assert.match(source, /themeVariables:/);
+  assert.match(source, /--theme-background/);
+  assert.match(source, /--theme-foreground/);
   assert.match(source, /sanitizeDiagramSvg\(result\.svg\)[\s\S]*await loadPanZoom\(\)/);
   assert.doesNotMatch(source, /export.*(?:png|svg)|download|saveDialog/i);
 });

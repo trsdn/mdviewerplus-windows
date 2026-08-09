@@ -14,21 +14,34 @@ const panZoomInstances = new WeakMap();
 
 async function loadMermaid() {
   if (!mermaidPromise) {
-    mermaidPromise = import('mermaid').then((module) => {
-      const mermaid = module.default || module;
-      mermaid.initialize({
-        startOnLoad: false,
-        securityLevel: 'strict',
-        htmlLabels: false,
-        suppressErrorRendering: true,
-        flowchart: { htmlLabels: false },
-        sequence: { useMaxWidth: true },
-        theme: 'base',
-      });
-      return mermaid;
-    });
+    mermaidPromise = import('mermaid').then((module) => module.default || module);
   }
   return mermaidPromise;
+}
+
+function configureMermaid(mermaid) {
+  const styles = getComputedStyle(document.documentElement);
+  const color = (name) => styles.getPropertyValue(name).trim();
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'strict',
+    htmlLabels: false,
+    suppressErrorRendering: true,
+    flowchart: { htmlLabels: false },
+    sequence: { useMaxWidth: true },
+    theme: 'base',
+    themeVariables: {
+      background: color('--theme-background'),
+      primaryColor: color('--theme-code-background'),
+      primaryTextColor: color('--theme-foreground'),
+      primaryBorderColor: color('--theme-border'),
+      lineColor: color('--theme-blockquote-foreground'),
+      secondaryColor: color('--theme-background'),
+      tertiaryColor: color('--theme-code-background'),
+      noteBkgColor: color('--theme-code-background'),
+      noteTextColor: color('--theme-foreground'),
+    },
+  });
 }
 
 async function loadPanZoom() {
@@ -113,7 +126,7 @@ function addControls(container, instance) {
   });
 }
 
-async function renderOne(container, { isCurrent, getSource }) {
+async function renderOne(container, { isCurrent, getSource, mermaid }) {
   if (!isCurrent() || !container.isConnected) return;
   const source = getSource(container);
   if (!source || source.length > MERMAID_LIMITS.maxSourceCharacters) {
@@ -123,7 +136,6 @@ async function renderOne(container, { isCurrent, getSource }) {
 
   container.dataset.diagramState = 'rendering';
   try {
-    const mermaid = await loadMermaid();
     if (!isCurrent() || !container.isConnected) return;
     const id = `mdviewer-mermaid-${++renderSequence}`;
     const result = await renderTimeout(mermaid.render(id, source));
@@ -218,14 +230,18 @@ export const diagramRenderer = Object.freeze({
   id: 'mermaid',
 
   async render(containers, options) {
+    const mermaid = await loadMermaid();
+    if (!options.isCurrent()) return;
+    configureMermaid(mermaid);
+    const renderOptions = { ...options, mermaid };
     const bounded = containers.slice(0, MERMAID_LIMITS.maxDiagrams);
     for (const overflow of containers.slice(MERMAID_LIMITS.maxDiagrams)) {
       showError(overflow, `Only ${MERMAID_LIMITS.maxDiagrams} diagrams are rendered per document.`);
     }
     if (options.forceAll) {
-      await renderPool(bounded, options);
+      await renderPool(bounded, renderOptions);
     } else {
-      lazyRender(bounded, options);
+      lazyRender(bounded, renderOptions);
     }
   },
 

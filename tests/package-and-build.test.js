@@ -20,7 +20,7 @@ test('all product manifests use version 2.0.0 and exact Full dependency pins', a
   for (const [name, version] of Object.entries({
     dompurify: '3.4.12',
     'highlight.js': '11.11.1',
-    'js-yaml': '4.3.1',
+    'js-yaml': '5.2.3',
     'marked-footnote': '1.4.0',
     mermaid: '11.16.0',
     prismjs: '1.30.0',

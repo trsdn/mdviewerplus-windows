@@ -77,7 +77,7 @@ This Full build bundles the packages listed below. Full license texts follow the
 | highlight.js | 11.11.1 | https://registry.npmjs.org/highlight.js/-/highlight.js-11.11.1.tgz | BSD-3-Clause | sha1-/KBvoOWu7PbE1DcjkTX6vBUhNYU= | Full |
 | internmap | 1.0.1 | https://registry.npmjs.org/internmap/-/internmap-1.0.1.tgz | ISC | sha1-ABfMijuZYF8DAvKxmNJy4BXl35U= | Full |
 | internmap | 2.0.3 | https://registry.npmjs.org/internmap/-/internmap-2.0.3.tgz | ISC | sha1-ZoXyN1XkPFJOJR0py8lySOMGEAk= | Full |
-| js-yaml | 4.3.1 | https://registry.npmjs.org/js-yaml/-/js-yaml-4.3.1.tgz | MIT | sha1-ASFsAB1n9I4s1WDXCMevIQkKOEg= | Full |
+| js-yaml | 5.2.3 | https://registry.npmjs.org/js-yaml/-/js-yaml-5.2.3.tgz | MIT | sha1-CUKuj1B+IusOVGJIcXic1HcQblQ= | Full |
 | katex | 0.16.47 | https://registry.npmjs.org/katex/-/katex-0.16.47.tgz | MIT | sha1-ChOkLC3rT3TmHxYtRAuRZaVIAw8= | Full |
 | khroma | 2.1.0 | https://registry.npmjs.org/khroma/-/khroma-2.1.0.tgz | UNKNOWN | sha1-RfLOlM4jGkN89bY8LohubrQru7E= | Full |
 | layout-base | 2.0.1 | https://registry.npmjs.org/layout-base/-/layout-base-2.0.1.tgz | MIT | sha1-0DN5E1hskPnCwHUpIGn1wtpd0oU= | Full |
@@ -2396,11 +2396,11 @@ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 ```
 
-## js-yaml 4.3.1
+## js-yaml 5.2.3
 
 License: MIT
 
-Package checksum: sha1-ASFsAB1n9I4s1WDXCMevIQkKOEg=
+Package checksum: sha1-CUKuj1B+IusOVGJIcXic1HcQblQ=
 
 ```text
 (The MIT License)

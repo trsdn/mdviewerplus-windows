@@ -55,10 +55,11 @@ release available yet at the pinned or latest published version:
   path is not reachable.
 - Mermaid `GHSA-6x64-9x62-f2gx`, `GHSA-3rrr-jr9j-h3q3`, `GHSA-2v8p-3f2j-5mp7`,
   `GHSA-rhh3-jpg6-66xh`, `GHSA-c4c3-pg64-4m4v` (fixed upstream at `>=11.16.1`,
-  not yet published on npm at audit time): Mermaid is initialized with a
-  fully static, hardcoded configuration object — no user- or document-derived
-  data ever reaches `mermaid.initialize`, so the reported prototype-pollution
-  config APIs are not reachable. Diagram source text is bounded
+  not yet published on npm at audit time): Mermaid is initialized only from
+  hardcoded security options and trusted built-in palette variables — no
+  user- or document-derived data ever reaches `mermaid.initialize`, so the
+  reported prototype-pollution config APIs are not reachable. Diagram source
+  text is bounded
   (`MERMAID_LIMITS.maxSourceCharacters`), diagram count is bounded
   (`MERMAID_LIMITS.maxDiagrams`), concurrency is bounded
   (`MERMAID_LIMITS.maxConcurrent`), and each render is raced against a

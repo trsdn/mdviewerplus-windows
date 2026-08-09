@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MDViewer+</title>
+  <link rel="stylesheet" href="styles/app.css">
+  <link rel="stylesheet" href="styles/preview.css">
+  <link rel="stylesheet" href="styles/editor-theme.css">
+</head>
+<body data-view-mode="view" data-appearance="system" data-theme="light" data-theme-id="github-light">
+  <div id="app">
+    <div id="editor-pane">
+      <div id="editor"></div>
+    </div>
+    <div id="splitter"></div>
+    <div id="preview-pane">
+      <section id="preview-find" class="preview-find-panel" aria-label="Find in preview" hidden>
+        <label class="visually-hidden" for="preview-find-input">Find in preview</label>
+        <input id="preview-find-input" type="search" autocomplete="off" spellcheck="false">
+        <button id="preview-find-previous" type="button" title="Previous match">Previous</button>
+        <button id="preview-find-next" type="button" title="Next match">Next</button>
+        <span id="preview-find-status" role="status" aria-live="polite"></span>
+        <button id="preview-find-close" type="button" title="Close find">Close</button>
+      </section>
+      <div id="preview-content"></div>
+    </div>
+  </div>
+  <dialog id="appearance-settings" aria-labelledby="appearance-settings-title">
+    <form method="dialog">
+      <div class="settings-dialog__header">
+        <h1 id="appearance-settings-title">Appearance Settings</h1>
+        <p>Choose how MDViewer+ follows Windows and which trusted palettes it uses.</p>
+      </div>
+
+      <label for="appearance-mode">Appearance</label>
+      <select id="appearance-mode" name="appearance"></select>
+
+      <label for="light-theme">Light theme</label>
+      <div class="theme-picker">
+        <select id="light-theme" name="light-theme"></select>
+        <span id="light-theme-swatch" class="theme-swatch" aria-label="Light theme color preview"></span>
+      </div>
+
+      <label for="dark-theme">Dark theme</label>
+      <div class="theme-picker">
+        <select id="dark-theme" name="dark-theme"></select>
+        <span id="dark-theme-swatch" class="theme-swatch" aria-label="Dark theme color preview"></span>
+      </div>
+
+      <div class="settings-dialog__actions">
+        <button id="appearance-cancel" type="button">Cancel</button>
+        <button class="button-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="quick-open" class="palette-dialog" aria-labelledby="quick-open-title">
+    <div class="palette-dialog__header">
+      <h1 id="quick-open-title">Quick Open</h1>
+      <form method="dialog"><button type="submit" aria-label="Close Quick Open">Close</button></form>
+    </div>
+    <label class="visually-hidden" for="quick-open-input">Filter Markdown files</label>
+    <input id="quick-open-input" type="search" autocomplete="off" spellcheck="false" placeholder="Filter current folder…">
+    <div id="quick-open-results" class="palette-results" role="listbox"></div>
+    <p id="quick-open-status" class="palette-status" role="status"></p>
+  </dialog>
+  <dialog id="outline-dialog" class="palette-dialog" aria-labelledby="outline-title">
+    <div class="palette-dialog__header">
+      <h1 id="outline-title">Document Outline</h1>
+      <form method="dialog"><button type="submit" aria-label="Close outline">Close</button></form>
+    </div>
+    <label class="visually-hidden" for="outline-input">Filter headings</label>
+    <input id="outline-input" type="search" autocomplete="off" spellcheck="false" placeholder="Filter headings…">
+    <div id="outline-results" class="palette-results" role="listbox"></div>
+    <p id="outline-status" class="palette-status" role="status"></p>
+  </dialog>
+  <dialog id="image-viewer" aria-labelledby="image-viewer-caption">
+    <div class="image-viewer__toolbar">
+      <span id="image-viewer-caption"></span>
+      <span id="image-zoom-status" role="status">100%</span>
+      <button id="image-zoom-out" type="button">Zoom out</button>
+      <button id="image-zoom-in" type="button">Zoom in</button>
+      <button id="image-zoom-fit" type="button">Fit</button>
+      <button id="image-zoom-actual" type="button">Actual size</button>
+      <button id="image-zoom-close" type="button">Close</button>
+    </div>
+    <div id="image-viewer-stage" class="image-viewer__stage">
+      <img id="image-viewer-image" alt="">
+    </div>
+  </dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title">
+    <form method="dialog" class="about-dialog__content">
+      <h1 id="about-title">MDViewer+ for Windows</h1>
+      <p><strong>Edition:</strong> <span id="about-edition"></span></p>
+      <p><strong>Version:</strong> <span id="about-version"></span></p>
+      <p>Offline Markdown viewing and editing. Installers are currently unsigned.</p>
+      <button type="submit">Close</button>
+    </form>
+  </dialog>
+  <script src="bundle.js" type="module"></script>
+</body>
+</html>

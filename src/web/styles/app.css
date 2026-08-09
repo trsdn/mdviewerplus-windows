@@ -1,0 +1,431 @@
+:root {
+  --splitter-width: 6px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+}
+
+body {
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+}
+
+body ::selection {
+  color: var(--theme-selection-foreground);
+  background: var(--theme-selection-background);
+}
+
+#app {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: var(--theme-background);
+}
+
+#editor-pane {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+#editor {
+  flex: 1;
+  overflow: auto;
+}
+
+#editor .cm-editor {
+  height: 100%;
+}
+
+#editor .cm-scroller {
+  overflow: auto;
+}
+
+#splitter {
+  flex-shrink: 0;
+  width: var(--splitter-width);
+  cursor: col-resize;
+  user-select: none;
+  background: var(--theme-splitter);
+}
+
+#splitter:hover,
+#splitter.dragging {
+  background: var(--theme-splitter-hover);
+}
+
+#preview-pane {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  overflow: auto;
+  background: var(--theme-background);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.preview-find-panel {
+  position: sticky;
+  z-index: 20;
+  top: 8px;
+  display: flex;
+  width: min(620px, calc(100% - 16px));
+  min-height: 42px;
+  margin: 8px 8px -50px auto;
+  padding: 6px;
+  gap: 6px;
+  align-items: center;
+  color: var(--theme-foreground);
+  background: var(--theme-code-background);
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--theme-foreground) 18%, transparent);
+}
+
+.preview-find-panel[hidden] {
+  display: none;
+}
+
+.preview-find-panel input {
+  min-width: 80px;
+  flex: 1;
+}
+
+.preview-find-panel input,
+.preview-find-panel button,
+.palette-dialog input,
+.palette-dialog button,
+.image-viewer__toolbar button,
+.about-dialog__content button {
+  min-height: 30px;
+  padding: 4px 8px;
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: 5px;
+  font: inherit;
+}
+
+.preview-find-panel button,
+.palette-dialog button,
+.image-viewer__toolbar button,
+.about-dialog__content button {
+  cursor: pointer;
+}
+
+.preview-find-panel :focus-visible,
+.palette-dialog :focus-visible,
+.image-viewer__toolbar :focus-visible,
+.about-dialog__content :focus-visible {
+  outline: 2px solid var(--theme-splitter-hover);
+  outline-offset: 2px;
+}
+
+.preview-find-panel span {
+  min-width: 72px;
+  color: var(--theme-blockquote-foreground);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+#preview-content {
+  transform-origin: top left;
+}
+
+body[data-view-mode="view"] #editor-pane,
+body[data-view-mode="view"] #splitter,
+body[data-view-mode="edit"] #preview-pane,
+body[data-view-mode="edit"] #splitter {
+  display: none;
+}
+
+dialog {
+  width: min(480px, calc(100vw - 32px));
+  margin: auto;
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px color-mix(in srgb, var(--theme-foreground) 24%, transparent);
+}
+
+.palette-dialog {
+  width: min(680px, calc(100vw - 32px));
+  padding: 14px;
+}
+
+.palette-dialog__header {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.palette-dialog__header h1 {
+  font-size: 1.1rem;
+}
+
+.palette-dialog > input {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+.palette-results {
+  max-height: min(55vh, 440px);
+  margin-top: 8px;
+  overflow: auto;
+  border: 1px solid var(--theme-border);
+  border-radius: 6px;
+}
+
+.palette-option {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+  border: 0;
+  border-bottom: 1px solid var(--theme-border);
+  border-radius: 0 !important;
+  text-align: left;
+}
+
+.palette-option:last-child {
+  border-bottom: 0;
+}
+
+.palette-option[aria-selected="true"] {
+  color: var(--theme-selection-foreground);
+  background: var(--theme-selection-background);
+}
+
+.outline-option {
+  padding-left: calc(10px + var(--outline-depth) * 18px);
+}
+
+.palette-status {
+  min-height: 1.4em;
+  margin-top: 8px;
+  color: var(--theme-blockquote-foreground);
+  font-size: 0.8rem;
+}
+
+#image-viewer {
+  width: calc(100vw - 32px);
+  max-width: none;
+  height: calc(100vh - 32px);
+}
+
+.image-viewer__toolbar {
+  display: flex;
+  min-height: 48px;
+  padding: 8px;
+  gap: 6px;
+  align-items: center;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+#image-viewer-caption {
+  min-width: 0;
+  margin-right: auto;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-viewer__stage {
+  display: grid;
+  height: calc(100% - 48px);
+  overflow: hidden;
+  cursor: grab;
+  place-items: center;
+  touch-action: none;
+  background: var(--theme-code-background);
+}
+
+.image-viewer__stage:active {
+  cursor: grabbing;
+}
+
+#image-viewer-image {
+  max-width: none;
+  max-height: none;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.about-dialog__content {
+  display: grid;
+  padding: 24px;
+  gap: 12px;
+}
+
+.about-dialog__content h1 {
+  font-size: 1.25rem;
+}
+
+.about-dialog__content button {
+  justify-self: end;
+}
+
+dialog::backdrop {
+  background: color-mix(in srgb, var(--theme-foreground) 35%, transparent);
+}
+
+.settings-dialog__header {
+  margin-bottom: 22px;
+}
+
+.settings-dialog__header h1 {
+  margin-bottom: 6px;
+  font-size: 1.3rem;
+}
+
+.settings-dialog__header p {
+  color: var(--theme-blockquote-foreground);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+#appearance-settings form {
+  display: grid;
+  gap: 8px;
+  padding: 24px;
+}
+
+#appearance-settings label {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+#appearance-settings select,
+#appearance-settings button {
+  min-height: 36px;
+  color: var(--theme-code-foreground);
+  background: var(--theme-code-background);
+  border: 1px solid var(--theme-code-foreground);
+  border-radius: 6px;
+  font: inherit;
+}
+
+#appearance-settings select {
+  width: 100%;
+  padding: 6px 10px;
+}
+
+#appearance-settings button {
+  min-width: 84px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+#appearance-settings .button-primary {
+  color: var(--theme-selection-foreground);
+  background: var(--theme-selection-background);
+  border-color: var(--theme-selection-foreground);
+}
+
+#appearance-settings :focus-visible {
+  outline: 2px solid var(--theme-splitter-hover);
+  outline-offset: 2px;
+}
+
+.theme-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 88px;
+  gap: 10px;
+  align-items: center;
+}
+
+.theme-swatch {
+  display: flex;
+  height: 30px;
+  overflow: hidden;
+  border: 1px solid var(--theme-border);
+  border-radius: 6px;
+}
+
+.theme-swatch__color {
+  flex: 1;
+}
+
+.settings-dialog__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+
+@media (max-width: 520px) {
+  .theme-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .theme-swatch {
+    width: 88px;
+  }
+
+  .preview-find-panel span,
+  .preview-find-panel button {
+    font-size: 0;
+  }
+
+  .preview-find-panel button::first-letter {
+    font-size: 0.8rem;
+  }
+
+  .image-viewer__toolbar {
+    overflow-x: auto;
+  }
+}
+
+@media print {
+  html,
+  body,
+  #app,
+  #preview-pane {
+    height: auto;
+    overflow: visible;
+  }
+
+  #editor-pane,
+  #splitter,
+  .preview-find-panel,
+  dialog {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}

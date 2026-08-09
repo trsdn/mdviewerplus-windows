@@ -1,12 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicedoc/tauri/main/crates/tauri-utils/schema.json",
   "productName": "MDViewer+",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "identifier": "com.mdviewerplus.windows",
   "build": {
-    "frontendDist": "../dist",
-    "beforeDevCommand": "npm run build:frontend",
-    "beforeBuildCommand": "npm run build:frontend"
+    "frontendDist": "../dist/full",
+    "beforeDevCommand": "npm run build:frontend:full",
+    "beforeBuildCommand": ""
   },
   "app": {
     "withGlobalTauri": false,
@@ -22,16 +22,13 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' asset: https://asset.localhost; font-src 'self'",
-      "assetProtocol": {
-        "enable": true,
-        "scope": ["**"]
-      }
+      "csp": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob:; font-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'"
     }
   },
   "bundle": {
     "active": true,
     "targets": ["nsis", "msi"],
+    "publisher": "Torsten Mahr",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

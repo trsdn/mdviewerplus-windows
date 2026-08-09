@@ -1,0 +1,5 @@
+MDViewer+ for Windows installers are currently unsigned.
+
+Windows may display a SmartScreen warning. Download only from the project's
+GitHub Releases page and verify the installer's attached SHA-256 checksum before
+running it. This project does not claim Authenticode signing.

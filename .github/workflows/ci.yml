@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  dual-edition-security-and-native-tests:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.2
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: npm ci
+      - name: Build, audit, and test Lite and Full
+        run: npm test
+      - name: Check Rust formatting
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+      - name: Test native security and watcher code
+        run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+      - name: Test Lite native feature selection
+        run: cargo test --manifest-path src-tauri/Cargo.toml --locked --no-default-features --features lite
+      - name: Lint native code
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --locked --all-targets -- -D warnings

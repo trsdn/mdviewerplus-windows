@@ -1,0 +1,89 @@
+import assert from 'node:assert/strict';
+import { readFile, readdir, stat } from 'node:fs/promises';
+import path from 'node:path';
+import test from 'node:test';
+
+import { auditEdition } from '../scripts/audit-artifacts.mjs';
+import { renderWinGetManifests } from '../scripts/generate-winget-manifests.mjs';
+
+const root = path.resolve(new URL('..', import.meta.url).pathname);
+
+test('all product manifests use version 2.0.0 and exact Full dependency pins', async () => {
+  const [packageJson, cargo, tauri] = await Promise.all([
+    readFile(path.join(root, 'package.json'), 'utf8').then(JSON.parse),
+    readFile(path.join(root, 'src-tauri/Cargo.toml'), 'utf8'),
+    readFile(path.join(root, 'src-tauri/tauri.conf.json'), 'utf8').then(JSON.parse),
+  ]);
+  assert.equal(packageJson.version, '2.0.0');
+  assert.match(cargo, /version = "2\.0\.0"/);
+  assert.equal(tauri.version, '2.0.0');
+  for (const [name, version] of Object.entries({
+    dompurify: '3.4.12',
+    'highlight.js': '11.11.1',
+    'js-yaml': '4.3.1',
+    'marked-footnote': '1.4.0',
+    mermaid: '11.16.0',
+    prismjs: '1.30.0',
+    'svg-pan-zoom': '3.6.2',
+  })) {
+    assert.equal(packageJson.dependencies[name], version, name);
+  }
+  assert.equal(packageJson.devDependencies.esbuild, '0.28.1');
+});
+
+test('clean edition outputs physically exclude opposite highlighters and Full packages', async () => {
+  const [lite, full] = await Promise.all([auditEdition('lite'), auditEdition('full')]);
+  assert.deepEqual(lite.violations, []);
+  assert.deepEqual(full.violations, []);
+  assert.ok(lite.highlighterBytes > 0 && lite.highlighterBytes <= 10 * 1024);
+  for (const forbidden of ['mermaid', 'highlight.js', 'js-yaml', 'svg-pan-zoom']) {
+    assert.equal(lite.packages.includes(forbidden), false, forbidden);
+    assert.equal(full.packages.includes(forbidden), true, forbidden);
+  }
+
+  const liteFiles = await readdir(path.join(root, 'dist/lite/chunks'));
+  const fullFiles = await readdir(path.join(root, 'dist/full/chunks'));
+  assert.equal(liteFiles.some((name) => /mermaid|hljs|yaml|pan-zoom/i.test(name)), false);
+  assert.equal(fullFiles.length > liteFiles.length, true);
+});
+
+test('third-party notices include exact version, source, checksum, license, and edition', async () => {
+  for (const edition of ['lite', 'full']) {
+    const notice = await readFile(path.join(root, `dist/${edition}/THIRD-PARTY-NOTICES.md`), 'utf8');
+    assert.match(notice, /\| Package \| Version \| Source \| License \| Package checksum \| Edition \|/);
+    assert.match(notice, new RegExp(`\\| (?:Lite|Full) \\|`));
+    assert.match(notice, /sha512-/);
+    assert.match(notice, /```text[\s\S]+```/);
+  }
+});
+
+test('both edition outputs contain source web assets and no source maps', async () => {
+  for (const edition of ['lite', 'full']) {
+    for (const file of ['index.html', 'styles/app.css', 'styles/editor-theme.css', 'styles/preview.css']) {
+      assert.ok((await stat(path.join(root, 'dist', edition, file))).isFile());
+    }
+    const files = await readdir(path.join(root, 'dist', edition), { recursive: true });
+    assert.equal(files.some((file) => String(file).endsWith('.map')), false);
+  }
+});
+
+test('prepared WinGet manifests target only Full current-user NSIS and are not submitted', async () => {
+  const manifests = renderWinGetManifests({
+    version: '2.0.0',
+    installerUrl: 'https://github.com/trsdn/mdviewerplus-windows/releases/download/v2.0.0/MDViewerPlus-Full-Windows-x64-Setup.exe',
+    installerSha256: 'A'.repeat(64),
+  });
+  const installer = manifests['Trsdn.MDViewerPlus.installer.yaml'];
+  assert.match(installer, /InstallerType: nullsoft/);
+  assert.match(installer, /Scope: user/);
+  assert.match(installer, /Silent: \/S/);
+  assert.match(installer, /UpgradeBehavior: install/);
+  assert.match(installer, /InstallerSha256: A{64}/);
+  assert.doesNotMatch(installer, /Lite|\.msi/);
+
+  const workflow = await readFile(path.join(root, '.github/workflows/winget-manifests.yml'), 'utf8');
+  assert.match(workflow, /workflow_dispatch/);
+  assert.match(workflow, /environment: winget-manifest-approval/);
+  assert.match(workflow, /winget validate/);
+  assert.doesNotMatch(workflow, /wingetcreate\s+submit|microsoft\/winget-pkgs|gh pr create/i);
+});

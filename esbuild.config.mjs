@@ -1,13 +1,3 @@
-import { build } from 'esbuild';
+import { buildFrontend } from './scripts/build-frontend.mjs';
 
-await build({
-  entryPoints: ['src/js/main.js'],
-  bundle: true,
-  outfile: 'dist/bundle.js',
-  format: 'esm',
-  target: 'es2020',
-  minify: process.env.NODE_ENV === 'production',
-  sourcemap: process.env.NODE_ENV !== 'production',
-});
-
-console.log('Frontend build complete.');
+await buildFrontend(process.env.MDVIEWER_EDITION || 'full');

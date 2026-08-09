@@ -1,0 +1,52 @@
+name: Prepare WinGet Manifests
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Released version, for example 2.0.0
+        required: true
+        type: string
+      installer_url:
+        description: Immutable Full NSIS release URL
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  generate-and-validate:
+    environment: winget-manifest-approval
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.2
+      - name: Download approved Full installer
+        shell: pwsh
+        env:
+          INSTALLER_URL: ${{ inputs.installer_url }}
+        run: Invoke-WebRequest -Uri $env:INSTALLER_URL -OutFile MDViewerPlus-Full-Windows-x64-Setup.exe
+      - name: Generate manifests with immutable SHA-256
+        shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+          INSTALLER_URL: ${{ inputs.installer_url }}
+        run: |
+          node scripts/generate-winget-manifests.mjs `
+            --version=$env:VERSION `
+            --installer=MDViewerPlus-Full-Windows-x64-Setup.exe `
+            --url=$env:INSTALLER_URL `
+            --output=winget/Trsdn.MDViewerPlus/$env:VERSION
+      - name: Validate manifests locally
+        shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+        run: winget validate --manifest "winget/Trsdn.MDViewerPlus/$env:VERSION"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pending-winget-manifests-${{ inputs.version }}
+          path: winget/**
+          if-no-files-found: error

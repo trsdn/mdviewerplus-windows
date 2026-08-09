@@ -14,6 +14,11 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 .build(app)?,
         )
         .item(
+            &MenuItemBuilder::with_id("quick_open", "Quick Open…")
+                .accelerator("CmdOrCtrl+K")
+                .build(app)?,
+        )
+        .item(
             &MenuItemBuilder::with_id("save", "Save")
                 .accelerator("CmdOrCtrl+S")
                 .build(app)?,
@@ -41,6 +46,12 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 .build(app)?,
         )
         .separator()
+        .item(
+            &MenuItemBuilder::with_id("print", "Print…")
+                .accelerator("CmdOrCtrl+P")
+                .build(app)?,
+        )
+        .separator()
         .item(&MenuItemBuilder::with_id("quit", "Quit").build(app)?)
         .build()?;
 
@@ -58,6 +69,16 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 .accelerator("CmdOrCtrl+F")
                 .build(app)?,
         )
+        .item(
+            &MenuItemBuilder::with_id("find_next", "Find Next")
+                .accelerator("F3")
+                .build(app)?,
+        )
+        .item(
+            &MenuItemBuilder::with_id("find_previous", "Find Previous")
+                .accelerator("Shift+F3")
+                .build(app)?,
+        )
         .build()?;
 
     let format_menu = SubmenuBuilder::new(app, "Format")
@@ -73,7 +94,7 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         )
         .item(
             &MenuItemBuilder::with_id("format_link", "Link")
-                .accelerator("CmdOrCtrl+K")
+                .accelerator("CmdOrCtrl+Shift+K")
                 .build(app)?,
         )
         .build()?;
@@ -104,6 +125,11 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 .accelerator("CmdOrCtrl+E")
                 .build(app)?,
         )
+        .item(
+            &MenuItemBuilder::with_id("outline", "Document Outline…")
+                .accelerator("CmdOrCtrl+Shift+O")
+                .build(app)?,
+        )
         .separator()
         .item(
             &MenuItemBuilder::with_id("zoom_in", "Zoom In")
@@ -125,10 +151,14 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         .build()?;
 
     let menu = Menu::new(app)?;
+    let help_menu = SubmenuBuilder::new(app, "Help")
+        .item(&MenuItemBuilder::with_id("about", "About MDViewer+").build(app)?)
+        .build()?;
     menu.append(&file_menu)?;
     menu.append(&edit_menu)?;
     menu.append(&view_menu)?;
     menu.append(&format_menu)?;
+    menu.append(&help_menu)?;
 
     Ok(menu)
 }

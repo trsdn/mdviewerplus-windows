@@ -1,7 +1,7 @@
 node_modules/
-dist/bundle.js
-dist/bundle.js.map
+dist/
 src-tauri/target/
 src-tauri/gen/
 *.log
+.copilot-open-issues.json
 .DS_Store

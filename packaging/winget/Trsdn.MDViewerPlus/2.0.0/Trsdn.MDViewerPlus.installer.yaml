@@ -1,0 +1,21 @@
+# Pending release preparation: the manually approved workflow replaces this
+# placeholder with the immutable Full NSIS asset SHA-256 before validation.
+PackageIdentifier: Trsdn.MDViewerPlus
+PackageVersion: 2.0.0
+InstallerType: nullsoft
+Scope: user
+UpgradeBehavior: install
+FileExtensions:
+  - md
+  - markdown
+  - mdown
+  - mkd
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/trsdn/mdviewerplus-windows/releases/download/v2.0.0/MDViewerPlus-Full-Windows-x64-Setup.exe
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    InstallerSwitches:
+      Silent: /S
+      SilentWithProgress: /S
+ManifestType: installer
+ManifestVersion: 1.10.0

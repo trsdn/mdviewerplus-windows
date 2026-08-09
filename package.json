@@ -1,14 +1,30 @@
 {
   "name": "mdviewerplus-windows",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "MDViewer+ for Windows — Markdown viewer and editor",
+  "license": "MIT",
+  "repository": "https://github.com/trsdn/mdviewerplus-windows",
+  "imports": {
+    "#edition": {
+      "full": "./src/js/editions/full.js",
+      "default": "./src/js/editions/lite.js"
+    }
+  },
   "scripts": {
-    "dev": "npm run build:frontend && tauri dev",
-    "build": "npm run build:frontend && tauri build",
-    "build:frontend": "node esbuild.config.mjs",
-    "test": "node --test",
+    "dev": "npm run build:frontend:full && tauri dev --config src-tauri/tauri.full.conf.json",
+    "build": "npm run build:editions",
+    "build:frontend": "npm run build:frontend:full",
+    "build:frontend:lite": "node scripts/build-frontend.mjs --edition=lite",
+    "build:frontend:full": "node scripts/build-frontend.mjs --edition=full",
+    "build:editions": "npm run build:frontend:lite && npm run build:frontend:full && npm run audit:artifacts",
+    "build:installer:lite": "node scripts/build-tauri.mjs --edition=lite",
+    "build:installer:full": "node scripts/build-tauri.mjs --edition=full",
+    "audit:artifacts": "node scripts/audit-artifacts.mjs",
+    "measure:builds": "node scripts/measure-builds.mjs",
+    "test": "npm run build:editions && node --test",
     "test:frontend": "node --test",
+    "test:packages": "node --test tests/package-and-build.test.js",
     "tauri": "tauri"
   },
   "dependencies": {
@@ -21,12 +37,18 @@
     "@lezer/highlight": "^1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2",
-    "@tauri-apps/plugin-fs": "^2",
-    "@tauri-apps/plugin-shell": "^2",
-    "marked": "^15.0.7"
+    "dompurify": "3.4.12",
+    "highlight.js": "11.11.1",
+    "js-yaml": "4.3.1",
+    "marked": "^15.0.7",
+    "marked-footnote": "1.4.0",
+    "mermaid": "11.16.0",
+    "prismjs": "1.30.0",
+    "svg-pan-zoom": "3.6.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
-    "esbuild": "^0.24"
+    "esbuild": "0.28.1",
+    "jsdom": "30.0.1"
   }
 }

@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.0.0
+
+- Added Full and Lite editions from one shared source tree and product identity.
+- Added DOMPurify-before-insertion rendering, a strict CSP, restrictive Mermaid
+  SVG sanitization, confined native resource commands, and narrow capabilities.
+- Added serialized internal Markdown links, current-folder Quick Open, a
+  debounced native watcher, focus-aware Find, and a searchable document outline.
+- Added footnotes, GitHub alerts, read-only task lists, local image inspection,
+  and accessible code-block controls.
+- Added a <=10 KiB custom Lite Prism chunk for the documented language set.
+- Added lazy Full highlight.js, restricted YAML frontmatter cards, complete
+  offline Mermaid ESM rendering, and post-render svg-pan-zoom.
+- Added dual-edition artifact audits, package provenance/notices, Node/Rust
+  security tests, and release-ready Lite/Full NSIS/MSI automation.
+- Prepared but did not submit proposed `Trsdn.MDViewerPlus` WinGet manifests.
+- Preserved the explicit unsigned-installer disclosure and per-asset checksums.
+
 ## 1.2.0
 
 - Added `Ctrl+N` New File with untitled-document Save As behavior.

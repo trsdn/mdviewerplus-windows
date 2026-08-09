@@ -129,7 +129,7 @@ test('CSS variable mapping is stable, complete, and used by tracked styles', asy
     'app.css',
     'editor-theme.css',
     'preview.css',
-  ].map((name) => readFile(new URL(`../dist/styles/${name}`, import.meta.url), 'utf8')));
+  ].map((name) => readFile(new URL(`../src/web/styles/${name}`, import.meta.url), 'utf8')));
   const combinedStyles = styles.join('\n');
   for (const variable of expectedNames) {
     assert.match(combinedStyles, new RegExp(`var\\(${variable.replaceAll('-', '\\-')}\\)`));
@@ -139,8 +139,8 @@ test('CSS variable mapping is stable, complete, and used by tracked styles', asy
 test('Windows integration keeps trusted syntax, dialog, and release safeguards', async () => {
   const [editorSource, editorStyles, appStyles, workflow] = await Promise.all([
     readFile(new URL('../src/js/editor.js', import.meta.url), 'utf8'),
-    readFile(new URL('../dist/styles/editor-theme.css', import.meta.url), 'utf8'),
-    readFile(new URL('../dist/styles/app.css', import.meta.url), 'utf8'),
+    readFile(new URL('../src/web/styles/editor-theme.css', import.meta.url), 'utf8'),
+    readFile(new URL('../src/web/styles/app.css', import.meta.url), 'utf8'),
     readFile(new URL('../.github/workflows/release.yml', import.meta.url), 'utf8'),
   ]);
 

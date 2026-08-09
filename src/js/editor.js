@@ -103,6 +103,17 @@ export function openFind() {
   if (editorView) openSearchPanel(editorView);
 }
 
+export function moveCaretToLine(lineNumber) {
+  if (!editorView || !Number.isInteger(lineNumber) || lineNumber < 1) return false;
+  const bounded = Math.min(lineNumber, editorView.state.doc.lines);
+  const line = editorView.state.doc.line(bounded);
+  editorView.dispatch({
+    selection: { anchor: line.from },
+    effects: EditorView.scrollIntoView(line.from, { y: 'start' }),
+  });
+  return true;
+}
+
 // Format commands
 
 function wrapSelection(before, after) {

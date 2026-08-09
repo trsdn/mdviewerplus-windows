@@ -10,7 +10,20 @@ import {
   save as saveDialog,
 } from '@tauri-apps/plugin-dialog';
 
-import { initEditor, setContent, getContent, setFontSize, formatBold, formatItalic, formatLink, openFind, getEditorView, getEditorElement } from './editor.js';
+import { CAPABILITIES } from '#edition';
+import {
+  initEditor,
+  setContent,
+  getContent,
+  setFontSize,
+  formatBold,
+  formatItalic,
+  formatLink,
+  openFind as openEditorFind,
+  getEditorView,
+  getEditorElement,
+  moveCaretToLine,
+} from './editor.js';
 import {
   canNavigate,
   documentTitle,
@@ -21,8 +34,28 @@ import {
   savedDocument,
 } from './document-policy.js';
 import { createDocumentOperationQueue } from './document-operation-queue.js';
+import { initImageViewer, openImageViewer } from './image-viewer.js';
 import { performOpenFile } from './open-file-operation.js';
-import { initPreview, renderMarkdown, setBaseDir, getPreviewPane } from './preview.js';
+import {
+  getPreviewPane,
+  initPreview,
+  preparePrint,
+  refreshPreview,
+  renderMarkdown,
+  scheduleRender,
+  scrollToFragment,
+  teardownPreview,
+} from './markdown/pipeline.js';
+import { initOutline, openOutline, setOutlineEntries } from './outline.js';
+import {
+  closePreviewFind,
+  initPreviewFind,
+  isPreviewFindOpen,
+  openPreviewFind,
+  previewFindNext,
+  refreshPreviewFind,
+} from './preview-find.js';
+import { handleFolderChanged, initQuickOpen, openQuickOpen } from './quick-open.js';
 import { initSplitPane } from './split-pane.js';
 import { initShortcuts, onMenuEvent } from './shortcuts.js';
 import { initTheme, setTheme, setThemeSettings, getThemeSettings } from './theme.js';
@@ -41,6 +74,7 @@ const documentOperations = createDocumentOperationQueue();
 let documentRevision = 0;
 let titleRevision = 0;
 let titleUpdates = Promise.resolve();
+let watcherGeneration = 0;
 
 // Scroll sync
 let isSyncing = false;
@@ -62,7 +96,7 @@ async function init() {
   }
 
   // Init theme
-  initTheme(settings);
+  initTheme(settings, () => refreshPreview());
   initAppearanceSettings((themeSettings) => {
     setThemeSettings(themeSettings);
     saveSettings();
@@ -84,13 +118,47 @@ async function init() {
   const editorContainer = document.getElementById('editor');
   initEditor(editorContainer, (text) => {
     documentRevision += 1;
-    renderMarkdown(text);
+    scheduleRender(text);
     updateWindowTitle();
   });
   setFontSize(settings.editor_font_size);
 
   // Init preview
-  initPreview();
+  initPreview({
+    openInternalLink: openInternalLink,
+    openExternalUrl: (url) => invoke('open_external_url', { url })
+      .catch((error) => showError('Could not open the external link.', error)),
+    loadImage: (relativePath) => {
+      if (!documentState.path) return null;
+      return invoke('read_local_image', {
+        currentPath: documentState.path,
+        relativePath,
+      });
+    },
+    onOutlineChange: setOutlineEntries,
+    onImageActivate: openImageViewer,
+    onAfterRender: refreshPreviewFind,
+  });
+  initPreviewFind();
+  initImageViewer();
+  initOutline({
+    onSelect: (entry) => {
+      scrollToFragment(entry.id);
+      if (entry.line) moveCaretToLine(entry.line);
+    },
+  });
+  initQuickOpen({
+    loadFiles: () => {
+      if (!documentState.path) return [];
+      return invoke('list_markdown_files', { currentPath: documentState.path });
+    },
+    openFile: (path) => enqueueDocumentOperation(
+      'Could not open the selected Markdown file.',
+      () => openFile(path),
+    ),
+  });
+  document.getElementById('about-edition').textContent = CAPABILITIES.label;
+  document.getElementById('about-version').textContent = __MDVIEWER_VERSION__;
 
   // Init split pane
   initSplitPane();
@@ -113,6 +181,11 @@ async function init() {
   // Wire menu events
   wireMenuEvents();
 
+  await listen('folder-changed', (event) => {
+    if (event.payload?.generation !== watcherGeneration) return;
+    handleFolderChanged();
+  });
+
   // Register for later file-association/single-instance opens before taking startup work.
   await listen('open-file', async (event) => {
     await enqueueDocumentOperation(
@@ -130,7 +203,11 @@ async function init() {
     await enqueueDocumentOperation('Could not close MDViewer+ safely.', async () => {
       if (await confirmDiscard('close the window')) {
         await closeAfterApproval(
-          () => getCurrentWindow().close(),
+          async () => {
+            await stopFolderWatcher();
+            teardownPreview();
+            await getCurrentWindow().close();
+          },
           (approved) => { closeApproved = approved; },
         );
       }
@@ -148,6 +225,9 @@ async function init() {
     ),
   });
   updateWindowTitle();
+  window.addEventListener('beforeprint', () => {
+    void preparePrint();
+  });
 }
 
 function wireMenuEvents() {
@@ -181,7 +261,14 @@ function wireMenuEvents() {
   ));
   onMenuEvent('quit', () => getCurrentWindow().close());
 
-  onMenuEvent('find', () => openFind());
+  onMenuEvent('find', openFind);
+  onMenuEvent('find_next', () => findAgain(false));
+  onMenuEvent('find_previous', () => findAgain(true));
+  onMenuEvent('quick_open', openQuickOpen);
+  onMenuEvent('outline', openOutline);
+  onMenuEvent('print', () => {
+    void preparePrint().then(() => window.print());
+  });
 
   onMenuEvent('format_bold', formatBold);
   onMenuEvent('format_italic', formatItalic);
@@ -197,6 +284,24 @@ function wireMenuEvents() {
   onMenuEvent('theme_light', () => { setTheme('light'); saveSettings(); });
   onMenuEvent('theme_dark', () => { setTheme('dark'); saveSettings(); });
   onMenuEvent('theme_settings', () => openAppearanceSettings(getThemeSettings()));
+  onMenuEvent('about', () => document.getElementById('about-dialog').showModal());
+}
+
+function openFind() {
+  if (getActivePane() === 'editor' || viewMode === 'edit') {
+    closePreviewFind();
+    openEditorFind();
+  } else {
+    openPreviewFind();
+  }
+}
+
+function findAgain(previous) {
+  if (isPreviewFindOpen() || getActivePane() === 'preview') {
+    previewFindNext(previous);
+  } else {
+    openEditorFind();
+  }
 }
 
 function updateEditorZoom() {
@@ -231,24 +336,22 @@ async function handleOpen() {
 
 async function openFile(filePath) {
   try {
-    return await performOpenFile({
+    const opened = await performOpenFile({
       confirmReplacement: () => confirmDiscard('open another file'),
       getDocumentRevision: () => documentRevision,
       readTarget: async () => {
-        const [contents, baseDir] = await Promise.all([
-          invoke('read_file', { path: filePath }),
-          invoke('resolve_base_url', { filePath }),
-        ]);
-        return { contents, baseDir };
+        const contents = await invoke('read_file', { path: filePath });
+        return { contents };
       },
-      applyTarget: ({ contents, baseDir }) => {
+      applyTarget: ({ contents }) => {
         documentState = loadedDocument(filePath, contents);
-        setBaseDir(baseDir);
         setContent(contents);
         renderMarkdown(contents);
         updateWindowTitle();
       },
     });
+    if (opened) await restartFolderWatcher(filePath);
+    return opened;
   } catch (error) {
     await showError('Could not open the Markdown file.', error);
     return false;
@@ -259,7 +362,7 @@ async function handleNew() {
   if (!await confirmDiscard('create a new file')) return;
 
   documentState = newDocument();
-  setBaseDir('');
+  await stopFolderWatcher();
   setContent('');
   renderMarkdown('');
   updateWindowTitle();
@@ -317,9 +420,7 @@ async function handleSaveAs() {
   if (!path) return false;
 
   const contents = getContent();
-  let baseDir;
   try {
-    baseDir = await invoke('resolve_base_url', { filePath: path });
     await invoke('write_file', { path, contents });
   } catch (error) {
     await showError('Could not save the Markdown file.', error);
@@ -328,10 +429,45 @@ async function handleSaveAs() {
 
   const completion = saveAsCompletion(documentState, path, contents, getContent());
   documentState = completion.state;
-  setBaseDir(baseDir);
   renderMarkdown(completion.previewContent);
   updateWindowTitle();
+  await restartFolderWatcher(path);
   return true;
+}
+
+async function openInternalLink({ path, fragment }) {
+  if (!documentState.path) return false;
+  return enqueueDocumentOperation(
+    'Could not open the internal Markdown link.',
+    async () => {
+      const target = await invoke('resolve_internal_markdown', {
+        currentPath: documentState.path,
+        relativePath: path,
+      });
+      const opened = await openFile(target);
+      if (opened && fragment) scrollToFragment(fragment);
+      return opened;
+    },
+  );
+}
+
+async function restartFolderWatcher(path) {
+  await stopFolderWatcher();
+  try {
+    watcherGeneration = await invoke('start_folder_watcher', { currentPath: path });
+  } catch (error) {
+    watcherGeneration = 0;
+    console.error('Could not start the folder watcher:', error);
+  }
+}
+
+async function stopFolderWatcher() {
+  watcherGeneration = 0;
+  try {
+    await invoke('stop_folder_watcher');
+  } catch (error) {
+    console.error('Could not stop the folder watcher:', error);
+  }
 }
 
 async function handleReload() {

@@ -88,13 +88,18 @@ test('Tauri builds invoke the installed CLI without Windows command-shim spawnin
   assert.doesNotMatch(contents, /npx\.cmd/);
 });
 
-test('MSI cross-edition verification forces same-version files to be replaced', async () => {
-  const contents = await readFile(path.join(root, 'packaging', 'verify-cross-edition.ps1'), 'utf8');
-  assert.match(contents, /"\/fvamus"/);
+test('MSI editions use ordered installer revisions and replace in both directions', async () => {
+  const [contents, liteConfig, fullConfig] = await Promise.all([
+    readFile(path.join(root, 'packaging', 'verify-cross-edition.ps1'), 'utf8'),
+    readFile(path.join(root, 'src-tauri', 'tauri.lite.conf.json'), 'utf8').then(JSON.parse),
+    readFile(path.join(root, 'src-tauri', 'tauri.full.conf.json'), 'utf8').then(JSON.parse),
+  ]);
+  assert.equal(liteConfig.bundle.windows.wix.version, '2.0.0.1');
+  assert.equal(fullConfig.bundle.windows.wix.version, '2.0.0.2');
   assert.match(contents, /WindowsInstaller -eq 1/);
   assert.match(contents, /Get-InstalledHash \$true/);
-  assert.doesNotMatch(contents, /REINSTALL=ALL/);
-  assert.doesNotMatch(contents, /REINSTALLMODE=vomus/);
+  assert.match(contents, /reverse cross-edition install/);
+  assert.doesNotMatch(contents, /REINSTALL|\/f[a-z]+/);
 });
 
 test('prepared WinGet manifests target only Full current-user NSIS and are not submitted', async () => {

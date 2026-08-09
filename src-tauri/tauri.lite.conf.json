@@ -2,5 +2,12 @@
   "build": {
     "frontendDist": "../dist/lite",
     "beforeBuildCommand": ""
+  },
+  "bundle": {
+    "windows": {
+      "wix": {
+        "version": "2.0.0.1"
+      }
+    }
   }
 }

@@ -62,7 +62,7 @@ if ($uninstaller) { Invoke-Installer $uninstaller.FullName @("/S") }
 Invoke-Installer "msiexec.exe" @("/i", "`"$LiteMsi`"", "/qn", "/norestart")
 $liteMsiHash = Get-InstalledHash
 Invoke-Installer "msiexec.exe" @(
-  "/i", "`"$FullMsi`"", "REINSTALL=ALL", "REINSTALLMODE=vomus", "/qn", "/norestart"
+  "/i", "`"$FullMsi`"", "REINSTALL=ALL", "REINSTALLMODE=vamus", "/qn", "/norestart"
 )
 $fullMsiHash = Get-InstalledHash
 if ($liteMsiHash -eq $fullMsiHash) {

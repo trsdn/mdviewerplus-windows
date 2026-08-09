@@ -88,6 +88,13 @@ test('Tauri builds invoke the installed CLI without Windows command-shim spawnin
   assert.doesNotMatch(contents, /npx\.cmd/);
 });
 
+test('MSI cross-edition verification forces same-version files to be replaced', async () => {
+  const contents = await readFile(path.join(root, 'packaging', 'verify-cross-edition.ps1'), 'utf8');
+  assert.match(contents, /REINSTALL=ALL/);
+  assert.match(contents, /REINSTALLMODE=vamus/);
+  assert.doesNotMatch(contents, /REINSTALLMODE=vomus/);
+});
+
 test('prepared WinGet manifests target only Full current-user NSIS and are not submitted', async () => {
   const manifests = renderWinGetManifests({
     version: '2.0.0',

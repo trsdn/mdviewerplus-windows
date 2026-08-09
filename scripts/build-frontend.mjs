@@ -52,7 +52,7 @@ export async function buildFrontend(edition, { minify = process.env.NODE_ENV !==
   return { edition, outputDirectory, metafile: result.metafile, notices };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const edition = editionFromArgv(process.argv.slice(2));
   const { outputDirectory, notices } = await buildFrontend(edition);
   console.log(

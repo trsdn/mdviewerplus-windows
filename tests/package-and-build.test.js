@@ -68,6 +68,19 @@ test('both edition outputs contain source web assets and no source maps', async 
   }
 });
 
+test('command-line module entrypoints use cross-platform file URL conversion', async () => {
+  for (const file of [
+    'build-frontend.mjs',
+    'audit-artifacts.mjs',
+    'measure-builds.mjs',
+    'generate-winget-manifests.mjs',
+  ]) {
+    const contents = await readFile(path.join(root, 'scripts', file), 'utf8');
+    assert.match(contents, /fileURLToPath\(import\.meta\.url\) === path\.resolve\(process\.argv\[1\]\)/);
+    assert.doesNotMatch(contents, /`file:\/\/\$\{process\.argv\[1\]\}`/);
+  }
+});
+
 test('prepared WinGet manifests target only Full current-user NSIS and are not submitted', async () => {
   const manifests = renderWinGetManifests({
     version: '2.0.0',

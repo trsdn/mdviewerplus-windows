@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const IDENTIFIER = 'Trsdn.MDViewerPlus';
 const MANIFEST_VERSION = '1.10.0';
@@ -70,7 +71,7 @@ function argument(name) {
   return process.argv.slice(2).find((value) => value.startsWith(`--${name}=`))?.slice(name.length + 3);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const version = argument('version');
   const installer = argument('installer');
   const installerUrl = argument('url');

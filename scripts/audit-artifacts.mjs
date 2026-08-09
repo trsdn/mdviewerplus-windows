@@ -112,7 +112,7 @@ function formatKilobytes(bytes) {
   return `${(bytes / 1024).toFixed(1)} KB`;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   let failed = false;
   for (const edition of EDITIONS) {
     const report = await auditEdition(edition);

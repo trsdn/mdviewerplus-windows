@@ -45,7 +45,7 @@ export async function collectBuildMetrics() {
   };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const metrics = await collectBuildMetrics();
   const output = path.join(root, 'docs', 'build-metrics.json');
   await mkdir(path.dirname(output), { recursive: true });

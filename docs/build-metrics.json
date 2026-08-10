@@ -1,17 +1,17 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "units": "bytes",
   "lite": {
-    "entryJavaScript": 641120,
-    "allJavaScript": 683212,
-    "allWebAssets": 758394,
+    "entryJavaScript": 642057,
+    "allJavaScript": 684149,
+    "allWebAssets": 761686,
     "prismChunk": 10109,
     "bundledPackages": 27
   },
   "full": {
-    "entryJavaScript": 641332,
-    "allJavaScript": 4328793,
-    "allWebAssets": 4487107,
+    "entryJavaScript": 642269,
+    "allJavaScript": 4329730,
+    "allWebAssets": 4490399,
     "bundledPackages": 84
   },
   "fullMinusLite": {

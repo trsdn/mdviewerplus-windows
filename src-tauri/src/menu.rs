@@ -152,6 +152,12 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
 
     let menu = Menu::new(app)?;
     let help_menu = SubmenuBuilder::new(app, "Help")
+        .item(
+            &MenuItemBuilder::with_id("help", "MDViewer+ Help")
+                .accelerator("F1")
+                .build(app)?,
+        )
+        .separator()
         .item(&MenuItemBuilder::with_id("about", "About MDViewer+").build(app)?)
         .build()?;
     menu.append(&file_menu)?;

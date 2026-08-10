@@ -30,6 +30,7 @@ const keyboardShortcuts = {
   'ctrl+shift+0': 'theme_system',
   'ctrl+shift+1': 'theme_light',
   'ctrl+shift+2': 'theme_dark',
+  'f1': 'help',
 };
 
 export function initShortcuts() {

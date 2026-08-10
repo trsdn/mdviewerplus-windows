@@ -89,11 +89,39 @@
     </div>
   </dialog>
   <dialog id="about-dialog" aria-labelledby="about-title">
-    <form method="dialog" class="about-dialog__content">
-      <h1 id="about-title">MDViewer+ for Windows</h1>
+    <form method="dialog" class="support-dialog__content">
+      <h1 id="about-title" tabindex="-1">About MDViewer+ for Windows</h1>
       <p><strong>Edition:</strong> <span id="about-edition"></span></p>
       <p><strong>Version:</strong> <span id="about-version"></span></p>
-      <p>Offline Markdown viewing and editing. Installers are currently unsigned.</p>
+      <p>Copyright © 2026 Torsten Mahr</p>
+      <nav aria-label="MDViewer+ information links">
+        <a data-support-link href="https://trsdn.github.io/mdviewerplus-windows/">Website and documentation</a>
+        <a data-support-link href="https://github.com/trsdn/mdviewerplus-windows">Source repository</a>
+        <a data-support-link href="https://github.com/trsdn/mdviewerplus-windows/issues/new">Report an issue</a>
+      </nav>
+      <button type="submit">Close</button>
+    </form>
+  </dialog>
+  <dialog id="help-dialog" aria-labelledby="help-title" aria-describedby="help-description">
+    <form method="dialog" class="support-dialog__content">
+      <h1 id="help-title" tabindex="-1">MDViewer+ Help</h1>
+      <p id="help-description">
+        <span id="help-edition"></span> edition, version <span id="help-version"></span>.
+        Open, edit, preview, and print Markdown files entirely offline.
+      </p>
+      <h2>Common shortcuts</h2>
+      <dl class="help-shortcuts">
+        <div><dt>Open</dt><dd><kbd>Ctrl</kbd>+<kbd>O</kbd></dd></div>
+        <div><dt>Save</dt><dd><kbd>Ctrl</kbd>+<kbd>S</kbd></dd></div>
+        <div><dt>Find</dt><dd><kbd>Ctrl</kbd>+<kbd>F</kbd></dd></div>
+        <div><dt>Toggle view</dt><dd><kbd>Ctrl</kbd>+<kbd>E</kbd></dd></div>
+      </dl>
+      <nav aria-label="Help and support links">
+        <a data-support-link href="https://trsdn.github.io/mdviewerplus-windows/">Read the documentation</a>
+        <a data-support-link href="https://github.com/trsdn/mdviewerplus-windows">View the source repository</a>
+        <a data-support-link href="https://github.com/trsdn/mdviewerplus-windows/issues/new">Report an issue</a>
+      </nav>
+      <p class="support-dialog__copyright">Copyright © 2026 Torsten Mahr</p>
       <button type="submit">Close</button>
     </form>
   </dialog>

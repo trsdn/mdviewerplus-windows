@@ -117,7 +117,7 @@ body ::selection {
 .palette-dialog input,
 .palette-dialog button,
 .image-viewer__toolbar button,
-.about-dialog__content button {
+.support-dialog__content button {
   min-height: 30px;
   padding: 4px 8px;
   color: var(--theme-foreground);
@@ -130,14 +130,14 @@ body ::selection {
 .preview-find-panel button,
 .palette-dialog button,
 .image-viewer__toolbar button,
-.about-dialog__content button {
+.support-dialog__content button {
   cursor: pointer;
 }
 
 .preview-find-panel :focus-visible,
 .palette-dialog :focus-visible,
 .image-viewer__toolbar :focus-visible,
-.about-dialog__content :focus-visible {
+.support-dialog__content :focus-visible {
   outline: 2px solid var(--theme-splitter-hover);
   outline-offset: 2px;
 }
@@ -279,18 +279,61 @@ dialog {
   -webkit-user-drag: none;
 }
 
-.about-dialog__content {
+.support-dialog__content {
   display: grid;
   padding: 24px;
   gap: 12px;
 }
 
-.about-dialog__content h1 {
+.support-dialog__content h1 {
   font-size: 1.25rem;
 }
 
-.about-dialog__content button {
+.support-dialog__content h2 {
+  font-size: 1rem;
+}
+
+.support-dialog__content nav {
+  display: grid;
+  gap: 8px;
+}
+
+.support-dialog__content a {
+  width: fit-content;
+  color: var(--theme-link);
+}
+
+.support-dialog__content button {
   justify-self: end;
+}
+
+.help-shortcuts {
+  display: grid;
+  gap: 6px;
+}
+
+.help-shortcuts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.help-shortcuts dd {
+  margin: 0;
+}
+
+kbd {
+  padding: 1px 5px;
+  background: var(--theme-code-background);
+  border: 1px solid var(--theme-border);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 0.85em;
+}
+
+.support-dialog__copyright {
+  color: var(--theme-blockquote-foreground);
+  font-size: 0.9rem;
 }
 
 dialog::backdrop {

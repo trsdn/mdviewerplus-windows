@@ -73,6 +73,18 @@ See [docs/security.md](docs/security.md) for the detailed trust boundaries.
 | Print | `Ctrl+P` |
 | Zoom in / out / reset | `Ctrl++` / `Ctrl+-` / `Ctrl+0` |
 | System / light / dark appearance | `Ctrl+Shift+0` / `Ctrl+Shift+1` / `Ctrl+Shift+2` |
+| Help | `F1` |
+
+## Help and support
+
+Open **Help > MDViewer+ Help** for shortcuts and support, or
+**Help > About MDViewer+** for the installed edition, version, and copyright.
+
+- [Website and documentation](https://trsdn.github.io/mdviewerplus-windows/)
+- [Source repository](https://github.com/trsdn/mdviewerplus-windows)
+- [Report an issue](https://github.com/trsdn/mdviewerplus-windows/issues/new)
+
+Copyright © 2026 Torsten Mahr.
 
 ## Install
 
@@ -148,13 +160,13 @@ idle watcher, and cross-edition replacement checks are listed in
 [docs/release-validation.md](docs/release-validation.md) and automated by the
 release workflow where feasible.
 
-Measurements from the current 2.0.0 source:
+Measurements from the current 2.0.1 source:
 
 | Minified output | Lite | Full |
 |---|---:|---:|
-| Initial JavaScript entry | 626.1 KiB | 626.3 KiB |
-| All lazy-capable JavaScript | 667.2 KiB | 4,228.1 KiB |
-| All web assets and notices | 740.6 KiB | 4,382.7 KiB |
+| Initial JavaScript entry | 627.0 KiB | 627.2 KiB |
+| All lazy-capable JavaScript | 668.1 KiB | 4,228.3 KiB |
+| All web assets and notices | 743.8 KiB | 4,385.2 KiB |
 | Lite Prism chunk | 9.9 KiB | Not included |
 
 The 0.2 KiB initial-entry difference demonstrates that ordinary Full documents

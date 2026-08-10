@@ -1,6 +1,6 @@
 [package]
 name = "mdviewerplus-windows"
-version = "2.0.0"
+version = "2.0.1"
 description = "MDViewer+ for Windows"
 authors = ["Torsten"]
 edition = "2021"

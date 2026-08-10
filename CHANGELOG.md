@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1
+
+- Added accessible in-app Help and About surfaces with edition/version details,
+  keyboard guidance, project links, issue reporting, and copyright information.
+- Added a GitHub Pages support page and refreshed project documentation.
+- Retained ordered MSI revisions for cross-edition replacement.
+
 ## 2.0.0
 
 - Added Full and Lite editions from one shared source tree and product identity.

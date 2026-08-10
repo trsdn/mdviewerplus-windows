@@ -9,15 +9,15 @@ import { renderWinGetManifests } from '../scripts/generate-winget-manifests.mjs'
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
-test('all product manifests use version 2.0.0 and exact Full dependency pins', async () => {
+test('all product manifests use version 2.0.1 and exact Full dependency pins', async () => {
   const [packageJson, cargo, tauri] = await Promise.all([
     readFile(path.join(root, 'package.json'), 'utf8').then(JSON.parse),
     readFile(path.join(root, 'src-tauri/Cargo.toml'), 'utf8'),
     readFile(path.join(root, 'src-tauri/tauri.conf.json'), 'utf8').then(JSON.parse),
   ]);
-  assert.equal(packageJson.version, '2.0.0');
-  assert.match(cargo, /version = "2\.0\.0"/);
-  assert.equal(tauri.version, '2.0.0');
+  assert.equal(packageJson.version, '2.0.1');
+  assert.match(cargo, /version = "2\.0\.1"/);
+  assert.equal(tauri.version, '2.0.1');
   for (const [name, version] of Object.entries({
     dompurify: '3.4.12',
     'highlight.js': '11.11.1',
@@ -94,8 +94,8 @@ test('MSI editions use ordered installer revisions and replace in both direction
     readFile(path.join(root, 'src-tauri', 'tauri.lite.conf.json'), 'utf8').then(JSON.parse),
     readFile(path.join(root, 'src-tauri', 'tauri.full.conf.json'), 'utf8').then(JSON.parse),
   ]);
-  assert.equal(liteConfig.bundle.windows.wix.version, '2.0.0.1');
-  assert.equal(fullConfig.bundle.windows.wix.version, '2.0.0.2');
+  assert.equal(liteConfig.bundle.windows.wix.version, '2.0.1.1');
+  assert.equal(fullConfig.bundle.windows.wix.version, '2.0.1.2');
   assert.match(contents, /WindowsInstaller -eq 1/);
   assert.match(contents, /Get-InstalledHash \$true/);
   assert.match(contents, /reverse cross-edition install/);
@@ -104,8 +104,8 @@ test('MSI editions use ordered installer revisions and replace in both direction
 
 test('prepared WinGet manifests target only Full current-user NSIS and are not submitted', async () => {
   const manifests = renderWinGetManifests({
-    version: '2.0.0',
-    installerUrl: 'https://github.com/trsdn/mdviewerplus-windows/releases/download/v2.0.0/MDViewerPlus-Full-Windows-x64-Setup.exe',
+    version: '2.0.1',
+    installerUrl: 'https://github.com/trsdn/mdviewerplus-windows/releases/download/v2.0.1/MDViewerPlus-Full-Windows-x64-Setup.exe',
     installerSha256: 'A'.repeat(64),
   });
   const installer = manifests['Trsdn.MDViewerPlus.installer.yaml'];
@@ -130,6 +130,18 @@ test('prepared WinGet manifests target only Full current-user NSIS and are not s
   assert.match(workflow, /environment: winget-manifest-approval/);
   assert.match(workflow, /winget validate/);
   assert.doesNotMatch(workflow, /wingetcreate\s+submit|microsoft\/winget-pkgs|gh pr create/i);
+
+  const preparedDirectory = path.join(
+    root,
+    'packaging',
+    'winget',
+    'Trsdn.MDViewerPlus',
+    '2.0.1',
+  );
+  for (const name of Object.keys(manifests)) {
+    const prepared = await readFile(path.join(preparedDirectory, name), 'utf8');
+    assert.match(prepared, /PackageVersion: 2\.0\.1/);
+  }
 });
 
 test('sdkks/jnscnn attribution appears only in release records, never README or Pages docs', async () => {

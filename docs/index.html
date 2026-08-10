@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Help and downloads for MDViewer+ for Windows.">
+  <title>MDViewer+ for Windows</title>
+  <style>
+    :root { color-scheme: light dark; font: 17px/1.6 system-ui, sans-serif; }
+    body { max-width: 760px; margin: auto; padding: 3rem 1.25rem; }
+    header, section, footer { margin-bottom: 2.5rem; }
+    h1 { line-height: 1.15; }
+    .edition { color: #0969da; font-weight: 700; }
+    nav { display: flex; flex-wrap: wrap; gap: .75rem 1.25rem; }
+    a { color: #0969da; }
+    kbd { padding: .1rem .35rem; border: 1px solid #8c959f; border-radius: .25rem; }
+    @media (prefers-color-scheme: dark) {
+      .edition, a { color: #58a6ff; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="edition">Version 2.0.1 · Lite and Full editions</p>
+    <h1>MDViewer+ for Windows</h1>
+    <p>An offline Markdown viewer and editor for Windows 10 and 11.</p>
+    <nav aria-label="Project links">
+      <a href="https://github.com/trsdn/mdviewerplus-windows">Source repository</a>
+      <a href="https://github.com/trsdn/mdviewerplus-windows/releases">Downloads</a>
+      <a href="https://github.com/trsdn/mdviewerplus-windows/issues/new">Report an issue</a>
+    </nav>
+  </header>
+
+  <main>
+    <section aria-labelledby="help">
+      <h2 id="help">Help</h2>
+      <p>In MDViewer+, press <kbd>F1</kbd> or choose <strong>Help → MDViewer+ Help</strong>.
+        The About screen identifies the installed edition and version.</p>
+      <p>Common shortcuts: <kbd>Ctrl</kbd>+<kbd>O</kbd> opens a file,
+        <kbd>Ctrl</kbd>+<kbd>S</kbd> saves, <kbd>Ctrl</kbd>+<kbd>F</kbd> finds,
+        and <kbd>Ctrl</kbd>+<kbd>E</kbd> changes the view.</p>
+    </section>
+
+    <section aria-labelledby="editions">
+      <h2 id="editions">Choose an edition</h2>
+      <p><strong>Full</strong> is recommended and includes broad syntax highlighting,
+        Mermaid diagrams, and YAML metadata. <strong>Lite</strong> is smaller and
+        contains only its selected offline preview features.</p>
+      <p>Installing one edition replaces the other while preserving the same product identity.</p>
+    </section>
+
+    <section aria-labelledby="security">
+      <h2 id="security">Privacy and security</h2>
+      <p>Documents are rendered locally. MDViewer+ does not use a CDN or download
+        preview content at runtime. Installers are currently unsigned; download
+        them only from the repository releases and verify the provided SHA-256 file.</p>
+      <p><a href="security.md">Read the security model</a>.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Copyright © 2026 Torsten Mahr · <a href="https://github.com/trsdn/mdviewerplus-windows">MDViewer+ repository</a></p>
+  </footer>
+</body>
+</html>

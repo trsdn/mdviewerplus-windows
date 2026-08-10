@@ -63,6 +63,7 @@ import { initAppearanceSettings, openAppearanceSettings } from './appearance-set
 import { initializeStartupDocument } from './startup-document.js';
 import { initZoom, zoomIn, zoomOut, zoomReset, setActivePane, getPreviewZoom, getEditorFontSize, getActivePane } from './zoom.js';
 import { closeAfterApproval } from './window-close-policy.js';
+import { initSupportDialogs, openAbout, openHelp } from './support-dialogs.js';
 
 // App state
 let documentState = newDocument();
@@ -157,8 +158,12 @@ async function init() {
       () => openFile(path),
     ),
   });
-  document.getElementById('about-edition').textContent = CAPABILITIES.label;
-  document.getElementById('about-version').textContent = __MDVIEWER_VERSION__;
+  initSupportDialogs({
+    edition: CAPABILITIES.label,
+    version: __MDVIEWER_VERSION__,
+    openExternalUrl: (url) => invoke('open_external_url', { url })
+      .catch((error) => showError('Could not open the support link.', error)),
+  });
 
   // Init split pane
   initSplitPane();
@@ -284,7 +289,8 @@ function wireMenuEvents() {
   onMenuEvent('theme_light', () => { setTheme('light'); saveSettings(); });
   onMenuEvent('theme_dark', () => { setTheme('dark'); saveSettings(); });
   onMenuEvent('theme_settings', () => openAppearanceSettings(getThemeSettings()));
-  onMenuEvent('about', () => document.getElementById('about-dialog').showModal());
+  onMenuEvent('help', openHelp);
+  onMenuEvent('about', openAbout);
 }
 
 function openFind() {

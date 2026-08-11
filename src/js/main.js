@@ -35,6 +35,10 @@ import {
 } from './document-policy.js';
 import { createDocumentOperationQueue } from './document-operation-queue.js';
 import { initImageViewer, openImageViewer } from './image-viewer.js';
+import {
+  createFolderNavigator,
+  syncFolderNavigatorAfterSaveAs,
+} from './folder-navigator.js';
 import { performOpenFile } from './open-file-operation.js';
 import {
   getPreviewPane,
@@ -76,6 +80,7 @@ let documentRevision = 0;
 let titleRevision = 0;
 let titleUpdates = Promise.resolve();
 let watcherGeneration = 0;
+let folderNavigator = null;
 
 // Scroll sync
 let isSyncing = false;
@@ -168,6 +173,30 @@ async function init() {
   // Init split pane
   initSplitPane();
 
+  const chooseFolderNavigatorRoot = async () => {
+    try {
+      const selected = await openDialog({
+        directory: true,
+        multiple: false,
+        title: 'Open Folder in Folder Navigator',
+      });
+      if (selected) {
+        await folderNavigator.setRoot(selected);
+        if (documentState.path) await folderNavigator.revealCurrent(documentState.path);
+      }
+    } catch (error) {
+      await showError('Could not open the folder picker.', error);
+    }
+  };
+  folderNavigator = createFolderNavigator({
+    invoke,
+    chooseRoot: chooseFolderNavigatorRoot,
+    openFile: (path) => enqueueDocumentOperation(
+      'Could not open the selected Markdown file.',
+      () => openFile(path),
+    ),
+  });
+
   // Init shortcuts
   initShortcuts();
 
@@ -190,6 +219,7 @@ async function init() {
     if (event.payload?.generation !== watcherGeneration) return;
     handleFolderChanged();
   });
+  await listen('folder-tree-changed', (event) => folderNavigator.refreshChanged(event.payload));
 
   // Register for later file-association/single-instance opens before taking startup work.
   await listen('open-file', async (event) => {
@@ -210,6 +240,7 @@ async function init() {
         await closeAfterApproval(
           async () => {
             await stopFolderWatcher();
+            await folderNavigator.dispose();
             teardownPreview();
             await getCurrentWindow().close();
           },
@@ -271,6 +302,12 @@ function wireMenuEvents() {
   onMenuEvent('find_previous', () => findAgain(true));
   onMenuEvent('quick_open', openQuickOpen);
   onMenuEvent('outline', openOutline);
+  onMenuEvent('toggle_folder_navigator', () => folderNavigator.toggle());
+  onMenuEvent('open_folder_navigator_root', () => folderNavigator.openRoot());
+  onMenuEvent('reveal_in_folder_navigator', () => {
+    folderNavigator.setVisible(true);
+    if (documentState.path) void folderNavigator.revealCurrent(documentState.path);
+  });
   onMenuEvent('print', () => {
     void preparePrint().then(() => window.print());
   });
@@ -356,7 +393,10 @@ async function openFile(filePath) {
         updateWindowTitle();
       },
     });
-    if (opened) await restartFolderWatcher(filePath);
+    if (opened) {
+      await restartFolderWatcher(filePath);
+      await folderNavigator?.setCurrentFile(filePath);
+    }
     return opened;
   } catch (error) {
     await showError('Could not open the Markdown file.', error);
@@ -369,6 +409,7 @@ async function handleNew() {
 
   documentState = newDocument();
   await stopFolderWatcher();
+  await folderNavigator?.setCurrentFile(null);
   setContent('');
   renderMarkdown('');
   updateWindowTitle();
@@ -438,6 +479,7 @@ async function handleSaveAs() {
   renderMarkdown(completion.previewContent);
   updateWindowTitle();
   await restartFolderWatcher(path);
+  await syncFolderNavigatorAfterSaveAs(folderNavigator, completion);
   return true;
 }
 

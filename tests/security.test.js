@@ -133,3 +133,11 @@ test('Tauri CSP and capabilities expose no unsafe scripts or broad filesystem/sh
   const sanitizerSource = await readFile(new URL('../src/js/security/sanitizer.js', import.meta.url), 'utf8');
   assert.doesNotMatch(sanitizerSource, /IN_PLACE\s*:/);
 });
+
+test('folder navigator consumes native relative node paths without constructing child absolutes', async () => {
+  const source = await readFile(new URL('../src/js/folder-navigator.js', import.meta.url), 'utf8');
+  assert.match(source, /relativeFile:\s*path/);
+  assert.match(source, /relativeDirectory:\s*directory/);
+  assert.doesNotMatch(source, /rootPath\s*\+\s*['"`][\\/\\\\]/);
+  assert.doesNotMatch(source, /path\.(join|resolve)\(/);
+});

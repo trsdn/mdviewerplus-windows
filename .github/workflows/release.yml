@@ -123,6 +123,11 @@ jobs:
           Copy-Item dist/full/THIRD-PARTY-NOTICES.md artifacts/THIRD-PARTY-NOTICES-Full.md
           Copy-Item packaging/UNSIGNED-INSTALLERS.txt artifacts/UNSIGNED-INSTALLERS.txt
 
+      - name: Audit Lite installer sizes against v2.0.1
+        run: |
+          node scripts/check-artifact-size.mjs windows-lite-nsis-x64 artifacts/MDViewerPlus-Lite-Windows-x64-Setup.exe
+          node scripts/check-artifact-size.mjs windows-lite-msi-x64 artifacts/MDViewerPlus-Lite-Windows-x64.msi
+
       - name: Generate and validate pending WinGet manifests
         shell: pwsh
         env:

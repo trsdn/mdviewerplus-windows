@@ -1,5 +1,6 @@
 :root {
   --splitter-width: 6px;
+  --folder-navigator-width: 240px;
 }
 
 * {
@@ -30,6 +31,156 @@ body ::selection {
   width: 100%;
   height: 100%;
   background: var(--theme-background);
+}
+
+#folder-navigator-toggle {
+  position: fixed;
+  z-index: 30;
+  top: 8px;
+  left: 8px;
+  min-height: 32px;
+  padding: 4px 9px;
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: 5px;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--theme-foreground) 14%, transparent);
+}
+
+body[data-folder-navigator-visible] #folder-navigator-toggle {
+  display: none;
+}
+
+#folder-navigator {
+  display: flex;
+  width: var(--folder-navigator-width);
+  min-width: 180px;
+  max-width: 420px;
+  flex: 0 0 var(--folder-navigator-width);
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--theme-code-background);
+  border-right: 1px solid var(--theme-border);
+}
+
+#folder-navigator[hidden],
+#folder-navigator-splitter[hidden] {
+  display: none;
+}
+
+.folder-navigator__header {
+  display: flex;
+  min-height: 42px;
+  padding: 6px;
+  gap: 5px;
+  align-items: center;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.folder-navigator__header button {
+  min-width: 32px;
+  min-height: 30px;
+  padding: 3px 7px;
+  overflow: hidden;
+  color: var(--theme-foreground);
+  background: var(--theme-background);
+  border: 1px solid var(--theme-border);
+  border-radius: 5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#folder-navigator-root {
+  flex: 1;
+  text-align: left;
+}
+
+#folder-navigator-tree {
+  min-height: 0;
+  flex: 1;
+  padding: 4px 0;
+  overflow: auto;
+}
+
+.folder-tree-item {
+  display: flex;
+  min-height: 30px;
+  padding: 4px 8px 4px calc(7px + var(--tree-depth, 0) * 17px);
+  align-items: center;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+}
+
+.folder-tree-root {
+  --tree-depth: 0;
+  font-weight: 600;
+}
+
+.folder-tree-disclosure {
+  width: 18px;
+  flex: 0 0 18px;
+  text-align: center;
+}
+
+.folder-tree-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-tree-item[aria-selected="true"] {
+  color: var(--theme-selection-foreground);
+  background: var(--theme-selection-background);
+}
+
+.folder-tree-item[data-current="true"] .folder-tree-label {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.folder-tree-item:focus-visible,
+#folder-navigator button:focus-visible,
+#folder-navigator-toggle:focus-visible,
+#folder-navigator-splitter:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid var(--theme-splitter-hover);
+  outline-offset: -2px;
+}
+
+.folder-tree-state {
+  min-height: 30px;
+  padding: 6px 10px 6px 26px;
+  color: var(--theme-blockquote-foreground);
+  font-size: .82rem;
+}
+
+.folder-tree-state.is-error,
+.folder-tree-state.is-truncated {
+  color: var(--theme-foreground);
+}
+
+#folder-navigator-status {
+  min-height: 38px;
+  padding: 6px 8px;
+  overflow: hidden;
+  color: var(--theme-blockquote-foreground);
+  border-top: 1px solid var(--theme-border);
+  font-size: .75rem;
+}
+
+#folder-navigator-splitter {
+  width: var(--splitter-width);
+  flex: 0 0 var(--splitter-width);
+  cursor: col-resize;
+  background: var(--theme-splitter);
+  touch-action: none;
+}
+
+#folder-navigator-splitter:hover {
+  background: var(--theme-splitter-hover);
 }
 
 #editor-pane {

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0
+
+- Added an optional, read-only Folder Navigator to Lite and Full.
+- Added lazy, bounded folder expansion, current-document reveal, loaded-folder
+  refresh, accessible tree keyboard controls, and persisted visibility and width.
+- Added **File > Open Folder…**, **View > Folder Navigator**, and
+  `Ctrl+Shift+B` while preserving Quick Open, outline, and dirty-safe opening.
+
 ## 2.0.1
 
 - Added accessible in-app Help and About surfaces with edition/version details,

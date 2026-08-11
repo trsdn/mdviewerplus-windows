@@ -9,15 +9,20 @@ import { renderWinGetManifests } from '../scripts/generate-winget-manifests.mjs'
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
-test('all product manifests use version 2.0.1 and exact Full dependency pins', async () => {
-  const [packageJson, cargo, tauri] = await Promise.all([
+test('frontend, Tauri, and Rust release metadata use version 2.1.0 and exact Full dependency pins', async () => {
+  const [packageJson, tauri, cargoToml, cargoLock] = await Promise.all([
     readFile(path.join(root, 'package.json'), 'utf8').then(JSON.parse),
-    readFile(path.join(root, 'src-tauri/Cargo.toml'), 'utf8'),
     readFile(path.join(root, 'src-tauri/tauri.conf.json'), 'utf8').then(JSON.parse),
+    readFile(path.join(root, 'src-tauri/Cargo.toml'), 'utf8'),
+    readFile(path.join(root, 'src-tauri/Cargo.lock'), 'utf8'),
   ]);
-  assert.equal(packageJson.version, '2.0.1');
-  assert.match(cargo, /version = "2\.0\.1"/);
-  assert.equal(tauri.version, '2.0.1');
+  assert.equal(packageJson.version, '2.1.0');
+  assert.equal(tauri.version, '2.1.0');
+  assert.match(cargoToml, /^\[package\][\s\S]*?^version = "2\.1\.0"$/m);
+  assert.match(
+    cargoLock,
+    /^\[\[package\]\]\nname = "mdviewerplus-windows"\nversion = "2\.1\.0"$/m,
+  );
   for (const [name, version] of Object.entries({
     dompurify: '3.4.12',
     'highlight.js': '11.11.1',
@@ -94,8 +99,8 @@ test('MSI editions use ordered installer revisions and replace in both direction
     readFile(path.join(root, 'src-tauri', 'tauri.lite.conf.json'), 'utf8').then(JSON.parse),
     readFile(path.join(root, 'src-tauri', 'tauri.full.conf.json'), 'utf8').then(JSON.parse),
   ]);
-  assert.equal(liteConfig.bundle.windows.wix.version, '2.0.1.1');
-  assert.equal(fullConfig.bundle.windows.wix.version, '2.0.1.2');
+  assert.equal(liteConfig.bundle.windows.wix.version, '2.1.0.1');
+  assert.equal(fullConfig.bundle.windows.wix.version, '2.1.0.2');
   assert.match(contents, /WindowsInstaller -eq 1/);
   assert.match(contents, /Get-InstalledHash \$true/);
   assert.match(contents, /reverse cross-edition install/);

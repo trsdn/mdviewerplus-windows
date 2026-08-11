@@ -3,6 +3,7 @@ use notify::{Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use percent_encoding::percent_decode_str;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
+use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::sync::{mpsc, Mutex};
@@ -14,6 +15,8 @@ use url::Url;
 const MAX_DOCUMENT_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_IMAGE_BYTES: u64 = 24 * 1024 * 1024;
 const WATCH_DEBOUNCE: Duration = Duration::from_millis(180);
+const FOLDER_TREE_WATCH_DEBOUNCE: Duration = Duration::from_millis(250);
+const FOLDER_TREE_RECONCILIATION_INTERVAL: Duration = Duration::from_secs(30);
 
 pub struct PendingStartupFile(Mutex<Option<String>>);
 
@@ -120,8 +123,24 @@ struct FolderChanged {
     generation: u64,
 }
 
+#[derive(Serialize, Clone, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+struct FolderTreeChanged {
+    generation: u64,
+    affected_paths: Vec<String>,
+    root_unavailable: bool,
+    // Refresh every already-loaded directory, without enumerating unopened branches.
+    rescan_required: bool,
+}
+
 enum WatcherMessage {
     Event(Event),
+    Stop,
+}
+
+enum FolderTreeWatcherMessage {
+    Event(Event),
+    WatchError,
     Stop,
 }
 
@@ -181,6 +200,59 @@ impl Drop for FolderWatcherState {
     }
 }
 
+struct FolderTreeActiveWatcher {
+    sender: mpsc::Sender<FolderTreeWatcherMessage>,
+    worker: Option<thread::JoinHandle<()>>,
+}
+
+impl FolderTreeActiveWatcher {
+    fn stop(mut self) {
+        let _ = self.sender.send(FolderTreeWatcherMessage::Stop);
+        if let Some(worker) = self.worker.take() {
+            let _ = worker.join();
+        }
+    }
+}
+
+struct FolderTreeWatcherInner {
+    next_generation: u64,
+    active: Option<FolderTreeActiveWatcher>,
+}
+
+pub struct FolderTreeWatcherState(Mutex<FolderTreeWatcherInner>);
+
+impl FolderTreeWatcherState {
+    pub fn new() -> Self {
+        Self(Mutex::new(FolderTreeWatcherInner {
+            next_generation: 0,
+            active: None,
+        }))
+    }
+
+    fn stop(&self) -> Result<(), ResourceError> {
+        let active = self
+            .0
+            .lock()
+            .map_err(|_| ResourceError::State("Could not access the folder tree watcher.".into()))?
+            .active
+            .take();
+        if let Some(active) = active {
+            active.stop();
+        }
+        Ok(())
+    }
+}
+
+impl Drop for FolderTreeWatcherState {
+    fn drop(&mut self) {
+        if let Ok(inner) = self.0.get_mut() {
+            if let Some(active) = inner.active.take() {
+                active.stop();
+            }
+        }
+    }
+}
+
 fn settings_path(app: &tauri::AppHandle) -> PathBuf {
     let directory = app
         .path()
@@ -189,7 +261,7 @@ fn settings_path(app: &tauri::AppHandle) -> PathBuf {
     directory.join("settings.json")
 }
 
-fn is_markdown_file_name(path: &Path) -> bool {
+pub(crate) fn is_markdown_file_name(path: &Path) -> bool {
     path.extension()
         .and_then(|extension| extension.to_str())
         .is_some_and(|extension| {
@@ -496,6 +568,272 @@ fn watcher_worker(
     }
 }
 
+#[derive(Default, Debug, PartialEq)]
+struct FolderTreeEventSummary {
+    affected_paths: BTreeSet<String>,
+    root_unavailable: bool,
+}
+
+struct FolderTreeReconciliationCadence {
+    interval: Duration,
+    next: Instant,
+}
+
+impl FolderTreeReconciliationCadence {
+    fn new(now: Instant) -> Self {
+        Self::with_interval(now, FOLDER_TREE_RECONCILIATION_INTERVAL)
+    }
+
+    fn with_interval(now: Instant, interval: Duration) -> Self {
+        Self {
+            interval,
+            next: now + interval,
+        }
+    }
+
+    fn remaining(&self, now: Instant) -> Duration {
+        self.next.saturating_duration_since(now)
+    }
+
+    fn take_due(&mut self, now: Instant) -> bool {
+        if now < self.next {
+            return false;
+        }
+        self.reset(now);
+        true
+    }
+
+    fn reset(&mut self, now: Instant) {
+        self.next = now + self.interval;
+    }
+}
+
+fn folder_tree_recovery_payload(generation: u64) -> FolderTreeChanged {
+    FolderTreeChanged {
+        generation,
+        affected_paths: Vec::new(),
+        root_unavailable: false,
+        rescan_required: true,
+    }
+}
+
+fn folder_tree_terminal_payload(generation: u64) -> FolderTreeChanged {
+    FolderTreeChanged {
+        generation,
+        affected_paths: vec![String::new()],
+        root_unavailable: true,
+        rescan_required: false,
+    }
+}
+
+impl FolderTreeEventSummary {
+    fn merge(&mut self, other: Self) {
+        self.affected_paths.extend(other.affected_paths);
+        self.root_unavailable |= other.root_unavailable;
+    }
+}
+
+fn normalized_watched_path(root: &Path, path: &Path) -> Option<String> {
+    let relative = path.strip_prefix(root).ok()?;
+    let components: Option<Vec<_>> = relative
+        .components()
+        .map(|component| match component {
+            Component::Normal(value) => value.to_str().map(str::to_owned),
+            _ => None,
+        })
+        .collect();
+    Some(components?.join("/"))
+}
+
+fn folder_tree_event_summary(event: &Event, root: &Path) -> Option<FolderTreeEventSummary> {
+    if matches!(event.kind, EventKind::Access(_)) {
+        return None;
+    }
+
+    let mut affected_paths: BTreeSet<_> = event
+        .paths
+        .iter()
+        .filter_map(|path| normalized_watched_path(root, path))
+        .collect();
+    let root_missing = !root.exists();
+    if affected_paths.is_empty() {
+        if root_missing {
+            affected_paths.insert(String::new());
+        } else {
+            return None;
+        }
+    }
+
+    let touches_root = affected_paths.contains("");
+    let root_terminal_event = touches_root
+        && matches!(
+            event.kind,
+            EventKind::Remove(_)
+                | EventKind::Modify(notify::event::ModifyKind::Name(_))
+                | EventKind::Other
+        );
+    Some(FolderTreeEventSummary {
+        affected_paths,
+        root_unavailable: root_terminal_event || root_missing,
+    })
+}
+
+fn folder_tree_watcher_worker<F>(
+    root: PathBuf,
+    generation: u64,
+    receiver: mpsc::Receiver<FolderTreeWatcherMessage>,
+    mut watcher: RecommendedWatcher,
+    mut emit: F,
+) where
+    F: FnMut(FolderTreeChanged),
+{
+    let mut reconciliation = FolderTreeReconciliationCadence::new(Instant::now());
+    loop {
+        let now = Instant::now();
+        if !root.exists() {
+            emit(folder_tree_terminal_payload(generation));
+            let _ = watcher.unwatch(&root);
+            return;
+        }
+        if reconciliation.take_due(now) {
+            emit(folder_tree_recovery_payload(generation));
+        }
+        let wait = FOLDER_TREE_WATCH_DEBOUNCE.min(reconciliation.remaining(now));
+        let message = match receiver.recv_timeout(wait) {
+            Ok(message) => message,
+            Err(mpsc::RecvTimeoutError::Timeout) => {
+                let now = Instant::now();
+                if !root.exists() {
+                    emit(folder_tree_terminal_payload(generation));
+                    let _ = watcher.unwatch(&root);
+                    return;
+                }
+                if reconciliation.take_due(now) {
+                    emit(folder_tree_recovery_payload(generation));
+                }
+                continue;
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => return,
+        };
+        match message {
+            FolderTreeWatcherMessage::Stop => {
+                let _ = watcher.unwatch(&root);
+                return;
+            }
+            FolderTreeWatcherMessage::WatchError => {
+                if root.exists() {
+                    emit(folder_tree_recovery_payload(generation));
+                    reconciliation.reset(Instant::now());
+                    continue;
+                }
+                emit(folder_tree_terminal_payload(generation));
+                let _ = watcher.unwatch(&root);
+                return;
+            }
+            FolderTreeWatcherMessage::Event(event) => {
+                let Some(mut summary) = folder_tree_event_summary(&event, &root) else {
+                    continue;
+                };
+                let mut deadline = Instant::now() + FOLDER_TREE_WATCH_DEBOUNCE;
+                while !summary.root_unavailable {
+                    let now = Instant::now();
+                    if reconciliation.take_due(now) {
+                        emit(folder_tree_recovery_payload(generation));
+                    }
+                    let remaining = deadline.saturating_duration_since(now);
+                    let wait = remaining.min(reconciliation.remaining(now));
+                    match receiver.recv_timeout(wait) {
+                        Ok(FolderTreeWatcherMessage::Stop) => {
+                            let _ = watcher.unwatch(&root);
+                            return;
+                        }
+                        Ok(FolderTreeWatcherMessage::WatchError) => {
+                            if root.exists() {
+                                emit(folder_tree_recovery_payload(generation));
+                                reconciliation.reset(Instant::now());
+                            } else {
+                                summary.affected_paths.clear();
+                                summary.affected_paths.insert(String::new());
+                                summary.root_unavailable = true;
+                            }
+                        }
+                        Ok(FolderTreeWatcherMessage::Event(event)) => {
+                            if let Some(next) = folder_tree_event_summary(&event, &root) {
+                                summary.merge(next);
+                                deadline = Instant::now() + FOLDER_TREE_WATCH_DEBOUNCE;
+                            }
+                        }
+                        Err(mpsc::RecvTimeoutError::Timeout) => {
+                            let now = Instant::now();
+                            if !root.exists() {
+                                summary.affected_paths.clear();
+                                summary.affected_paths.insert(String::new());
+                                summary.root_unavailable = true;
+                            } else if reconciliation.take_due(now) {
+                                emit(folder_tree_recovery_payload(generation));
+                            }
+                            if now >= deadline || summary.root_unavailable {
+                                break;
+                            }
+                        }
+                        Err(mpsc::RecvTimeoutError::Disconnected) => return,
+                    }
+                }
+                let root_unavailable = summary.root_unavailable;
+                emit(FolderTreeChanged {
+                    generation,
+                    affected_paths: summary.affected_paths.into_iter().collect(),
+                    root_unavailable,
+                    rescan_required: false,
+                });
+                if root_unavailable {
+                    let _ = watcher.unwatch(&root);
+                    return;
+                }
+            }
+        }
+    }
+}
+
+fn spawn_folder_tree_watcher<F>(
+    root: PathBuf,
+    generation: u64,
+    emit: F,
+) -> Result<FolderTreeActiveWatcher, ResourceError>
+where
+    F: FnMut(FolderTreeChanged) + Send + 'static,
+{
+    let (sender, receiver) = mpsc::channel();
+    let callback_sender = sender.clone();
+    let mut watcher = notify::recommended_watcher(move |result| {
+        let message = match result {
+            Ok(event) => FolderTreeWatcherMessage::Event(event),
+            Err(_) => FolderTreeWatcherMessage::WatchError,
+        };
+        let _ = callback_sender.send(message);
+    })
+    .map_err(|error| {
+        ResourceError::CannotWatch(format!("Could not create the folder tree watcher: {error}"))
+    })?;
+    watcher
+        .watch(&root, RecursiveMode::Recursive)
+        .map_err(|error| {
+            ResourceError::CannotWatch(format!("Could not watch '{}': {error}", root.display()))
+        })?;
+
+    let worker_root = root.clone();
+    let worker = thread::Builder::new()
+        .name("mdviewer-folder-tree-watcher".into())
+        .spawn(move || folder_tree_watcher_worker(worker_root, generation, receiver, watcher, emit))
+        .map_err(|error| {
+            ResourceError::CannotWatch(format!("Could not start the folder tree watcher: {error}"))
+        })?;
+    Ok(FolderTreeActiveWatcher {
+        sender,
+        worker: Some(worker),
+    })
+}
+
 #[tauri::command]
 pub fn read_file(path: String) -> Result<String, ResourceError> {
     let path = canonical_markdown_file(Path::new(&path))?;
@@ -680,6 +1018,42 @@ pub fn stop_folder_watcher(
 }
 
 #[tauri::command]
+pub fn start_folder_tree_watcher(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, FolderTreeWatcherState>,
+    root_path: String,
+) -> Result<u64, ResourceError> {
+    state.stop()?;
+    let root = crate::folder_tree::canonical_folder_root(Path::new(&root_path))?;
+
+    let generation = {
+        let mut inner = state.0.lock().map_err(|_| {
+            ResourceError::State("Could not access the folder tree watcher.".into())
+        })?;
+        inner.next_generation = inner.next_generation.wrapping_add(1).max(1);
+        inner.next_generation
+    };
+
+    let active = spawn_folder_tree_watcher(root, generation, move |payload| {
+        let _ = app.emit("folder-tree-changed", payload);
+    })?;
+
+    let mut inner = state
+        .0
+        .lock()
+        .map_err(|_| ResourceError::State("Could not access the folder tree watcher.".into()))?;
+    inner.active = Some(active);
+    Ok(generation)
+}
+
+#[tauri::command]
+pub fn stop_folder_tree_watcher(
+    state: tauri::State<'_, FolderTreeWatcherState>,
+) -> Result<(), ResourceError> {
+    state.stop()
+}
+
+#[tauri::command]
 pub fn get_settings(app: tauri::AppHandle) -> AppSettings {
     let path = settings_path(&app);
     if path.exists() {
@@ -709,14 +1083,18 @@ pub fn save_settings(app: tauri::AppHandle, settings: AppSettings) -> Result<(),
 #[cfg(test)]
 mod tests {
     use super::{
-        compare_file_names, decode_confined_relative_path, image_mime, markdown_files_in_directory,
-        resolve_confined_resource, sibling_markdown_path, AppSettings, NavigationDirection,
-        PendingStartupFile, ResourceError,
+        compare_file_names, decode_confined_relative_path, folder_tree_event_summary,
+        folder_tree_recovery_payload, image_mime, markdown_files_in_directory,
+        resolve_confined_resource, sibling_markdown_path, watcher_event_is_relevant, AppSettings,
+        FolderTreeChanged, FolderTreeReconciliationCadence, NavigationDirection,
+        PendingStartupFile, ResourceError, FOLDER_TREE_RECONCILIATION_INTERVAL,
+        FOLDER_TREE_WATCH_DEBOUNCE, WATCH_DEBOUNCE,
     };
+    use notify::{Event, EventKind};
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::sync::atomic::{AtomicU64, Ordering};
-    use std::time::{SystemTime, UNIX_EPOCH};
+    use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
     static NEXT_TEST_DIRECTORY: AtomicU64 = AtomicU64::new(1);
 
@@ -787,6 +1165,154 @@ mod tests {
         let pending = PendingStartupFile::new(Some("/notes/startup.md".into()));
         assert_eq!(pending.take().unwrap(), Some("/notes/startup.md".into()));
         assert_eq!(pending.take().unwrap(), None);
+    }
+
+    #[test]
+    fn watcher_modes_keep_their_existing_and_navigator_semantics() {
+        use notify::event::{CreateKind, ModifyKind};
+
+        let root = Path::new("/notes");
+        let nested = Event::new(EventKind::Create(CreateKind::File))
+            .add_path(root.join("nested").join("new.md"));
+        let direct_markdown =
+            Event::new(EventKind::Modify(ModifyKind::Any)).add_path(root.join("changed.md"));
+        let root_removed = Event::new(EventKind::Remove(notify::event::RemoveKind::Folder))
+            .add_path(root.to_path_buf());
+
+        assert!(!watcher_event_is_relevant(&nested, root));
+        assert!(watcher_event_is_relevant(&direct_markdown, root));
+        assert!(
+            folder_tree_event_summary(&root_removed, root)
+                .unwrap()
+                .root_unavailable
+        );
+        assert_eq!(WATCH_DEBOUNCE, Duration::from_millis(180));
+        assert_eq!(FOLDER_TREE_WATCH_DEBOUNCE, Duration::from_millis(250));
+        assert_eq!(FOLDER_TREE_RECONCILIATION_INTERVAL, Duration::from_secs(30));
+    }
+
+    #[test]
+    fn folder_tree_events_report_sorted_normalized_nested_paths() {
+        use notify::event::CreateKind;
+
+        let directory = TestDirectory::new();
+        let root = directory.path();
+        let event = Event::new(EventKind::Create(CreateKind::Any))
+            .add_path(root.join("zeta").join("new.md"))
+            .add_path(root.join("alpha").join("nested").join("readme.md"));
+
+        let summary = folder_tree_event_summary(&event, root).unwrap();
+        assert_eq!(
+            summary.affected_paths.into_iter().collect::<Vec<_>>(),
+            ["alpha/nested/readme.md", "zeta/new.md"]
+        );
+        assert!(!summary.root_unavailable);
+
+        let payload = serde_json::to_value(FolderTreeChanged {
+            generation: 7,
+            affected_paths: vec!["nested/readme.md".into()],
+            root_unavailable: false,
+            rescan_required: false,
+        })
+        .unwrap();
+        assert_eq!(payload["generation"], 7);
+        assert_eq!(payload["affectedPaths"][0], "nested/readme.md");
+        assert_eq!(payload["rootUnavailable"], false);
+        assert_eq!(payload["rescanRequired"], false);
+    }
+
+    #[test]
+    fn folder_tree_recovery_cadence_is_bounded_and_has_an_explicit_payload() {
+        let start = Instant::now();
+        let interval = Duration::from_secs(10);
+        let mut cadence = FolderTreeReconciliationCadence::with_interval(start, interval);
+
+        assert_eq!(cadence.remaining(start), interval);
+        assert!(!cadence.take_due(start + interval - Duration::from_millis(1)));
+        assert!(cadence.take_due(start + interval));
+        assert!(!cadence.take_due(start + interval));
+        assert_eq!(cadence.remaining(start + interval), interval);
+
+        let payload = folder_tree_recovery_payload(19);
+        assert_eq!(payload.generation, 19);
+        assert!(payload.affected_paths.is_empty());
+        assert!(!payload.root_unavailable);
+        assert!(payload.rescan_required);
+        let json = serde_json::to_value(payload).unwrap();
+        assert_eq!(json["rescanRequired"], true);
+    }
+
+    #[test]
+    fn folder_tree_root_deletion_and_rename_are_terminal() {
+        use notify::event::{ModifyKind, RemoveKind, RenameMode};
+
+        let directory = TestDirectory::new();
+        let root = directory.path();
+        let removed =
+            Event::new(EventKind::Remove(RemoveKind::Folder)).add_path(root.to_path_buf());
+        let renamed = Event::new(EventKind::Modify(ModifyKind::Name(RenameMode::Both)))
+            .add_path(root.to_path_buf())
+            .add_path(root.with_extension("moved"));
+
+        for event in [&removed, &renamed] {
+            let summary = folder_tree_event_summary(event, root).unwrap();
+            assert_eq!(summary.affected_paths.into_iter().collect::<Vec<_>>(), [""]);
+            assert!(summary.root_unavailable);
+        }
+
+        let moved = root.with_extension("moved");
+        fs::rename(root, &moved).unwrap();
+        let moved_event =
+            Event::new(EventKind::Modify(ModifyKind::Name(RenameMode::To))).add_path(moved.clone());
+        let summary = folder_tree_event_summary(&moved_event, root).unwrap();
+        assert_eq!(summary.affected_paths.into_iter().collect::<Vec<_>>(), [""]);
+        assert!(summary.root_unavailable);
+        fs::rename(moved, root).unwrap();
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn live_folder_tree_watcher_emits_terminal_root_move_and_stops() {
+        use std::thread;
+        use std::time::Instant;
+
+        let directory = TestDirectory::new();
+        directory.file("nested/readme.md");
+        let root = directory.path().canonicalize().unwrap();
+        let moved = root.with_extension("moved");
+        let generation = 41;
+        let (payload_sender, payload_receiver) = std::sync::mpsc::channel();
+        let active = super::spawn_folder_tree_watcher(root.clone(), generation, move |payload| {
+            let _ = payload_sender.send(payload);
+        })
+        .unwrap();
+
+        fs::rename(&root, &moved).unwrap();
+        let payload = payload_receiver
+            .recv_timeout(Duration::from_secs(10))
+            .expect("the live watcher should report the moved root");
+        assert_eq!(payload.generation, generation);
+        assert_eq!(payload.affected_paths, [""]);
+        assert!(payload.root_unavailable);
+
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while !active
+            .worker
+            .as_ref()
+            .is_some_and(thread::JoinHandle::is_finished)
+            && Instant::now() < deadline
+        {
+            thread::sleep(Duration::from_millis(25));
+        }
+        assert!(
+            active
+                .worker
+                .as_ref()
+                .is_some_and(thread::JoinHandle::is_finished),
+            "the terminal watcher worker should stop"
+        );
+        active.stop();
+        fs::rename(moved, root).unwrap();
     }
 
     #[test]

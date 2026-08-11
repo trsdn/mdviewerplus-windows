@@ -17,6 +17,7 @@ const keyboardShortcuts = {
   'ctrl+alt+arrowright': 'next_file',
   'ctrl+k': 'quick_open',
   'ctrl+shift+o': 'outline',
+  'ctrl+shift+b': 'toggle_folder_navigator',
   'ctrl+f': 'find',
   'f3': 'find_next',
   'shift+f3': 'find_previous',

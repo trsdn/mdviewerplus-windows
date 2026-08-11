@@ -12,6 +12,7 @@ installer and only the explicitly selected preview languages.
 |---|---:|---:|
 | Editing, live preview, themes, printing | Yes | Yes |
 | Focus-aware Find, current-folder Quick Open, outline | Yes | Yes |
+| Optional read-only Folder Navigator | Yes | Yes |
 | Secure internal Markdown links and native folder refresh | Yes | Yes |
 | Footnotes, GitHub alerts, task lists | Yes | Yes |
 | Image inspection and code-block controls | Yes | Yes |
@@ -29,6 +30,7 @@ the other. **Help > About MDViewer+** identifies the installed edition and versi
 - Live preview with bidirectional scroll synchronization
 - Serialized, dirty-safe New/Open/Reload/navigation/internal-link operations
 - Current-folder sibling navigation, Quick Open, and native event refresh
+- Optional local-only Folder Navigator with lazy expansion and current-file reveal
 - Editor CodeMirror search and dependency-free preview search
 - Searchable transient document outline with duplicate/Unicode heading anchors
 - GFM tables, task lists, alerts, and accessible footnotes
@@ -36,6 +38,17 @@ the other. **Help > About MDViewer+** identifies the installed edition and versi
 - Preview code labels, exact-source Copy, wrapping, and bounded line numbers
 - System/light/dark appearance with curated semantic palettes
 - Full-only lazy Mermaid, svg-pan-zoom, highlight.js, and YAML metadata
+
+## Folder Navigator
+
+Choose **File > Open Folder…** to authorize a folder, then use
+**View > Folder Navigator**, its toolbar button, or `Ctrl+Shift+B`. The navigator
+is hidden initially, remembers its 180–420 pixel width (240 by default), and
+shows only Markdown files (`md`, `markdown`, `mdown`, and `mkd`). Use Up, Down,
+Left, Right, Home, End, Enter, and Space in the tree. Expansion is lazy and
+limited to 12 levels, 500 direct children, and 5,000 loaded nodes. The feature
+is read-only and fully offline; opening a tree file retains the existing
+unsaved-change confirmation.
 
 ## Security model
 
@@ -51,8 +64,12 @@ the other. **Help > About MDViewer+** identifies the installed edition and versi
   resource sizes, traversal, encoded traversal, and symlink escapes.
 - Local images are read as bounded raster bytes and displayed through revocable
   blob URLs. SVG files are not accepted as Markdown image resources.
-- Folder watchers are non-recursive, debounced, generation-checked, and stopped
-  when the document changes or the window closes.
+- The current-document watcher is non-recursive. The separately authorized
+  navigator watcher is recursive. Both are debounced, generation-checked, and
+  stopped when their context changes or the window closes.
+- The explicitly authorized Folder Navigator is read-only. It excludes hidden,
+  package, symbolic-link, and unsupported entries; loads only expanded folders;
+  and bounds depth, direct children, loaded nodes, and native response size.
 
 See [docs/security.md](docs/security.md) for the detailed trust boundaries.
 
@@ -68,6 +85,7 @@ See [docs/security.md](docs/security.md) for the detailed trust boundaries.
 | Previous / next Markdown file | `Ctrl+Alt+Left` / `Ctrl+Alt+Right` |
 | Find / next / previous | `Ctrl+F` / `F3` / `Shift+F3` |
 | Document outline | `Ctrl+Shift+O` |
+| Toggle Folder Navigator | `Ctrl+Shift+B` |
 | Bold / italic / format link | `Ctrl+B` / `Ctrl+I` / `Ctrl+Shift+K` |
 | Toggle view mode | `Ctrl+E` |
 | Print | `Ctrl+P` |
@@ -160,7 +178,7 @@ idle watcher, and cross-edition replacement checks are listed in
 [docs/release-validation.md](docs/release-validation.md) and automated by the
 release workflow where feasible.
 
-Measurements from the current 2.0.1 source:
+The following measurements are the v2.0.1 pre-navigator baseline:
 
 | Minified output | Lite | Full |
 |---|---:|---:|

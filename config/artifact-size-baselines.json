@@ -1,0 +1,16 @@
+{
+  "windows-lite-nsis-x64": {
+    "bytes": 1862506,
+    "version": "2.0.1",
+    "platform": "Windows x64",
+    "packageFormat": "NSIS installer",
+    "source": "MDViewerPlus-Lite-Windows-x64-Setup.exe from https://github.com/trsdn/mdviewerplus-windows/releases/tag/v2.0.1"
+  },
+  "windows-lite-msi-x64": {
+    "bytes": 2666496,
+    "version": "2.0.1",
+    "platform": "Windows x64",
+    "packageFormat": "MSI installer",
+    "source": "MDViewerPlus-Lite-Windows-x64.msi from https://github.com/trsdn/mdviewerplus-windows/releases/tag/v2.0.1"
+  }
+}

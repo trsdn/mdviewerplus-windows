@@ -1,4 +1,5 @@
 mod commands;
+mod folder_tree;
 mod menu;
 
 #[cfg(all(feature = "lite", feature = "full"))]
@@ -31,6 +32,7 @@ pub fn run() {
     tauri::Builder::default()
         .manage(commands::PendingStartupFile::new(startup_file))
         .manage(commands::FolderWatcherState::new())
+        .manage(commands::FolderTreeWatcherState::new())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
@@ -44,6 +46,10 @@ pub fn run() {
             commands::open_external_url,
             commands::start_folder_watcher,
             commands::stop_folder_watcher,
+            folder_tree::list_folder_children,
+            folder_tree::resolve_folder_markdown,
+            commands::start_folder_tree_watcher,
+            commands::stop_folder_tree_watcher,
             commands::get_settings,
             commands::save_settings,
         ])

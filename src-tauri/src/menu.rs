@@ -13,6 +13,7 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
                 .accelerator("CmdOrCtrl+O")
                 .build(app)?,
         )
+        .item(&MenuItemBuilder::with_id("open_folder_navigator_root", "Open Folder…").build(app)?)
         .item(
             &MenuItemBuilder::with_id("quick_open", "Quick Open…")
                 .accelerator("CmdOrCtrl+K")
@@ -120,6 +121,19 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         .build()?;
 
     let view_menu = SubmenuBuilder::new(app, "View")
+        .item(
+            &MenuItemBuilder::with_id("toggle_folder_navigator", "Folder Navigator")
+                .accelerator("CmdOrCtrl+Shift+B")
+                .build(app)?,
+        )
+        .item(
+            &MenuItemBuilder::with_id(
+                "reveal_in_folder_navigator",
+                "Reveal Current Document in Folder Navigator",
+            )
+            .build(app)?,
+        )
+        .separator()
         .item(
             &MenuItemBuilder::with_id("toggle_edit_mode", "Toggle Edit Mode")
                 .accelerator("CmdOrCtrl+E")

@@ -21,7 +21,7 @@ test('frontend, Tauri, and Rust release metadata use version 2.1.0 and exact Ful
   assert.match(cargoToml, /^\[package\][\s\S]*?^version = "2\.1\.0"$/m);
   assert.match(
     cargoLock,
-    /^\[\[package\]\]\nname = "mdviewerplus-windows"\nversion = "2\.1\.0"$/m,
+    /^\[\[package\]\]\r?\nname = "mdviewerplus-windows"\r?\nversion = "2\.1\.0"$/m,
   );
   for (const [name, version] of Object.entries({
     dompurify: '3.4.12',

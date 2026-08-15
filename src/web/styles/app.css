@@ -623,3 +623,17 @@ dialog::backdrop {
     scroll-behavior: auto !important;
   }
 }
+
+#drop-overlay {
+  position: fixed;
+  inset: 8px;
+  z-index: 40;
+  pointer-events: none;
+  border: 3px dashed var(--theme-link, currentColor);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-link, currentColor) 8%, transparent);
+}
+
+#drop-overlay[hidden] {
+  display: none;
+}

@@ -31,6 +31,8 @@ the other. **Help > About MDViewer+** identifies the installed edition and versi
 - Serialized, dirty-safe New/Open/Reload/navigation/internal-link operations
 - Current-folder sibling navigation, Quick Open, and native event refresh
 - Optional local-only Folder Navigator with lazy expansion and current-file reveal
+- Drag and drop from Explorer: a Markdown file opens in the window and a dropped
+  folder becomes the Folder Navigator root
 - Editor CodeMirror search and dependency-free preview search
 - Searchable transient document outline with duplicate/Unicode heading anchors
 - GFM tables, task lists, alerts, and accessible footnotes

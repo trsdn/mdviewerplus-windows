@@ -2,6 +2,7 @@
 
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
+import { getCurrentWebview } from '@tauri-apps/api/webview';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import {
   confirm,
@@ -34,6 +35,11 @@ import {
   savedDocument,
 } from './document-policy.js';
 import { createDocumentOperationQueue } from './document-operation-queue.js';
+import {
+  classifyDropped,
+  extraDocumentsMessage,
+  rejectionMessage,
+} from './dropped-items.js';
 import { initImageViewer, openImageViewer } from './image-viewer.js';
 import {
   createFolderNavigator,
@@ -228,6 +234,8 @@ async function init() {
       () => openFile(event.payload),
     );
   });
+
+  await wireDragAndDrop();
 
   await getCurrentWindow().onCloseRequested(async (event) => {
     if (closeApproved) return;
@@ -575,6 +583,62 @@ async function enqueueDocumentOperation(errorSummary, operation) {
     await showError(errorSummary, error);
     return false;
   }
+}
+
+async function wireDragAndDrop() {
+  const overlay = document.getElementById('drop-overlay');
+  const showOverlay = (visible) => {
+    if (overlay) overlay.hidden = !visible;
+  };
+
+  await getCurrentWebview().onDragDropEvent(async (event) => {
+    if (event.payload.type === 'over' || event.payload.type === 'enter') {
+      showOverlay(true);
+      return;
+    }
+    if (event.payload.type !== 'drop') {
+      showOverlay(false);
+      return;
+    }
+
+    showOverlay(false);
+    await enqueueDocumentOperation(
+      'Could not open the dropped items.',
+      () => openDropped(event.payload.paths ?? []),
+    );
+  });
+}
+
+async function openDropped(paths) {
+  if (paths.length === 0) return;
+
+  const entries = await invoke('classify_dropped_paths', { paths });
+  const { markdownFiles, folders, unsupported } = classifyDropped(entries);
+
+  if (folders.length > 0) {
+    await folderNavigator.setRoot(folders[0]);
+  }
+
+  if (markdownFiles.length > 0) {
+    const opened = await openFile(markdownFiles[0]);
+    if (opened && markdownFiles.length > 1) {
+      await message(extraDocumentsMessage(markdownFiles), {
+        title: 'MDViewer+',
+        kind: 'info',
+      });
+    }
+    if (folders.length > 0 && documentState.path) {
+      await folderNavigator.revealCurrent(documentState.path);
+    }
+    return;
+  }
+
+  if (folders.length > 0) return;
+
+  await message(rejectionMessage(unsupported), {
+    title: 'Couldn\u2019t Open Dropped Items',
+    kind: 'warning',
+  });
 }
 
 async function showError(summary, error) {

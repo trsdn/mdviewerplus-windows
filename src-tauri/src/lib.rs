@@ -38,6 +38,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::read_file,
             commands::write_file,
+            commands::classify_dropped_paths,
             commands::take_startup_file,
             commands::sibling_markdown_file,
             commands::list_markdown_files,

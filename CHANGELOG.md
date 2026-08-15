@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added drag and drop: dropping a Markdown file opens it, dropping a folder
+  makes it the Folder Navigator root, and unsupported items explain why they
+  were rejected. Drops use the webview drag-drop event, so real filesystem
+  paths are resolved through the same validated commands as every other open.
+
 ## 2.1.0
 
 - Added an optional, read-only Folder Navigator to Lite and Full.

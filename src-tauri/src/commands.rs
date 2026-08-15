@@ -112,6 +112,12 @@ pub struct MarkdownFile {
 }
 
 #[derive(Serialize, Clone, Debug, PartialEq)]
+pub struct DroppedPath {
+    pub path: String,
+    pub kind: String,
+}
+
+#[derive(Serialize, Clone, Debug, PartialEq)]
 pub struct ImagePayload {
     pub base64: String,
     pub mime: String,
@@ -840,6 +846,29 @@ pub fn read_file(path: String) -> Result<String, ResourceError> {
     ensure_bounded_file(&path, MAX_DOCUMENT_BYTES)?;
     fs::read_to_string(&path)
         .map_err(|error| ResourceError::CannotRead(format!("Failed to read the file: {error}")))
+}
+
+/// Reports whether each dropped path is a directory, a file, or missing.
+///
+/// The webview only receives path strings for a drop, so the filesystem kind
+/// has to be resolved here. Symlinks resolve to their target so a dropped link
+/// cannot disguise a directory as a file.
+#[tauri::command]
+pub fn classify_dropped_paths(paths: Vec<String>) -> Vec<DroppedPath> {
+    paths
+        .into_iter()
+        .map(|path| {
+            let kind = match fs::metadata(Path::new(&path)) {
+                Ok(metadata) if metadata.is_dir() => "directory",
+                Ok(metadata) if metadata.is_file() => "file",
+                _ => "missing",
+            };
+            DroppedPath {
+                path,
+                kind: kind.to_owned(),
+            }
+        })
+        .collect()
 }
 
 #[tauri::command]

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.2.0
 
 - Added drag and drop: dropping a Markdown file opens it, dropping a folder
   makes it the Folder Navigator root, and unsupported items explain why they

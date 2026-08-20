@@ -45,7 +45,7 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
         run: winget validate --manifest "winget/Trsdn.MDViewerPlus/$env:VERSION"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: pending-winget-manifests-${{ inputs.version }}
           path: winget/**

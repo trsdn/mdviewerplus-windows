@@ -40,7 +40,7 @@
     "dompurify": "3.4.12",
     "highlight.js": "11.11.1",
     "js-yaml": "5.2.3",
-    "marked": "^15.0.7",
+    "marked": "^18.0.9",
     "marked-footnote": "1.4.0",
     "mermaid": "11.16.0",
     "prismjs": "1.30.0",

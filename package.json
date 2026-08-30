@@ -37,7 +37,7 @@
     "@lezer/highlight": "^1",
     "@tauri-apps/api": "2.11.1",
     "@tauri-apps/plugin-dialog": "2.7.2",
-    "dompurify": "3.4.12",
+    "dompurify": "3.4.14",
     "highlight.js": "11.11.1",
     "js-yaml": "5.2.3",
     "marked": "^15.0.7",

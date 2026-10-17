@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Fixed windows refusing to close from the title bar, Alt+F4, File > Quit, or
+  any other close request. `@tauri-apps/api` closes the window through
+  `Window.destroy()` once the close handler returns without preventing the
+  default, and the capability set never granted `core:window:allow-destroy`, so
+  that IPC was rejected and the rejection was lost inside the event listener.
+  The window stayed open with no error shown.
+
 ## 2.2.0
 
 - Added drag and drop: dropping a Markdown file opens it, dropping a folder

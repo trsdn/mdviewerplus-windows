@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Fixed files that use CRLF line endings being marked as unsaved as soon as
+  they were opened. The editor stores line breaks as LF, so the load baseline
+  now records the same LF form instead of the raw file bytes; a freshly opened
+  document is clean again and closing it no longer asks to discard changes.
+
 ## 2.2.0
 
 - Added drag and drop: dropping a Markdown file opens it, dropping a folder

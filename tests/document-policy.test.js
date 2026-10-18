@@ -8,6 +8,7 @@ import {
   isDirty,
   loadedDocument,
   newDocument,
+  normalizeLineEndings,
   requiresDiscardConfirmation,
   saveAsCompletion,
   savedDocument,
@@ -76,4 +77,22 @@ test('edit during Save As keeps preview current while the saved baseline stays c
   assert.equal(completion.state.savedContent, 'content sent to disk');
   assert.equal(completion.previewContent, 'newer editor content');
   assert.equal(isDirty(completion.state, completion.previewContent), true);
+});
+
+test('normalizeLineEndings rewrites CRLF and lone CR to the editor line break', () => {
+  assert.equal(normalizeLineEndings('a\r\nb\r\n'), 'a\nb\n');
+  assert.equal(normalizeLineEndings('a\rb\r'), 'a\nb\n');
+  assert.equal(normalizeLineEndings('a\nb\n'), 'a\nb\n');
+  assert.equal(normalizeLineEndings(''), '');
+});
+
+test('loading a CRLF document is clean because the editor stores LF line breaks', () => {
+  const editorContent = '# Windows\r\n\r\nCRLF body.\r\n'.replace(/\r\n/g, '\n');
+  const state = loadedDocument('/notes/windows.md', '# Windows\r\n\r\nCRLF body.\r\n');
+
+  assert.equal(state.savedContent, editorContent);
+  assert.equal(isDirty(state, editorContent), false);
+  assert.equal(requiresDiscardConfirmation(state, editorContent), false);
+  assert.equal(documentTitle(state, editorContent), 'windows.md — MDViewer+');
+  assert.equal(isDirty(state, `${editorContent}edited\n`), true);
 });

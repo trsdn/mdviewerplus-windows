@@ -4,9 +4,15 @@ export function createDocumentState(path = null, savedContent = '') {
   return { path, savedContent };
 }
 
+export function normalizeLineEndings(content) {
+  return content.replace(/\r\n?/g, '\n');
+}
+
 export function loadedDocument(path, content) {
   if (!path) throw new TypeError('A loaded document requires a path.');
-  return createDocumentState(path, content);
+  // The editor stores line breaks as LF, so the load baseline has to use the
+  // same form; otherwise every CRLF file would look dirty right after opening.
+  return createDocumentState(path, normalizeLineEndings(content));
 }
 
 export function newDocument() {
